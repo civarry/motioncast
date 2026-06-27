@@ -24,6 +24,13 @@ let ws;
 let tilt = { beta: 0, gamma: 0 }; // smoothed control input
 let scoreVal = 0;
 
+// Demo + model view orientation: "portrait" (default) or "landscape". In
+// landscape you hold the phone sideways and calibrate; the 3D model and the
+// arena rotate to match, and the ball-tilt mapping is remapped accordingly.
+let viewOrientation =
+  localStorage.getItem("view-orientation") === "landscape" ? "landscape" : "portrait";
+const isLandscape = () => viewOrientation === "landscape";
+
 // Link health: streamed frames per second + round-trip latency (ping/pong).
 let frameCount = 0, latencyMs = null, pingTimer = null;
 
@@ -155,6 +162,12 @@ function qmul(a, b) {
     z: a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
   };
 }
+// 90° rotation about the viewing axis (screen Z). Re-expresses the arena lean
+// in the rotated landscape frame so the board still tilts the right way when the
+// playfield is shown sideways (without rotating the wide canvas box itself).
+const QZ90 = { w: Math.SQRT1_2, x: 0, y: 0, z: Math.SQRT1_2 };
+const conjFrame = (q) => qmul(qmul(QZ90, q), conj(QZ90));
+
 // Build the corrective trim rotation from the active profile's degree offsets.
 // Pitch is always the X component; roll/yaw map to Y or Z per the active swap.
 function trimQuat() {
@@ -325,7 +338,10 @@ function renderPhone() {
   shownQuat = nlerp(shownQuat, tuned, 0.25);
   // Vertical drop offset (freefall → fall + bounce on the bed) wraps the rotation.
   const y = animateDrop().toFixed(1);
-  phoneModel.style.transform = `translateY(${y}px) ` + quatToMatrix3d(shownQuat, prof().swap);
+  // In landscape, spin the model 90° in the screen plane so it (and its motions)
+  // read sideways, matching how the phone is held.
+  const spin = isLandscape() ? "rotateZ(90deg) " : "";
+  phoneModel.style.transform = `translateY(${y}px) ` + spin + quatToMatrix3d(shownQuat, prof().swap);
   requestAnimationFrame(renderPhone);
 }
 renderPhone();
@@ -582,19 +598,48 @@ const fmt = (n) => (n == null ? "-" : n.toFixed(0) + "°");
 // ---------- Game ----------
 const cv = $("arena");
 const ctx = cv.getContext("2d");
-const W = cv.width, H = cv.height, R = 16;
+const R = 16;
+const FIELD = { w: 480, h: 760 }; // portrait playfield; landscape swaps the two
+let W = cv.width, H = cv.height;
 let ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
-let target = spawn();
+let target;
 
 function spawn() {
   const pad = 50;
   return { x: pad + Math.random() * (W - 2 * pad), y: pad + Math.random() * (H - 2 * pad), r: 22 };
 }
 
+// Resize the playfield for the current view and reflect it on the toggle.
+function applyViewOrientation() {
+  cv.width = isLandscape() ? FIELD.h : FIELD.w;
+  cv.height = isLandscape() ? FIELD.w : FIELD.h;
+  W = cv.width; H = cv.height;
+  ball.x = Math.max(R, Math.min(W - R, ball.x));
+  ball.y = Math.max(R, Math.min(H - R, ball.y));
+  target = spawn();
+  const pb = $("view-portrait"), lb = $("view-landscape");
+  if (pb) pb.classList.toggle("active", !isLandscape());
+  if (lb) lb.classList.toggle("active", isLandscape());
+}
+
+function setViewOrientation(o) {
+  viewOrientation = o === "landscape" ? "landscape" : "portrait";
+  localStorage.setItem("view-orientation", viewOrientation);
+  applyViewOrientation();
+  $("calNote").textContent = isLandscape()
+    ? "Landscape view - hold the phone sideways, then tap Calibrate front."
+    : "Portrait view - hold the phone upright, then tap Calibrate front.";
+}
+$("view-portrait").addEventListener("click", () => setViewOrientation("portrait"));
+$("view-landscape").addEventListener("click", () => setViewOrientation("landscape"));
+applyViewOrientation();
+
 function step() {
-  // gamma (left/right roll) -> x accel, beta (front/back pitch) -> y accel
-  const ax = (tilt.gamma || 0) * 0.015;
-  const ay = (tilt.beta || 0) * 0.015;
+  // Portrait: gamma (left/right) -> x accel, beta (front/back) -> y accel.
+  // Landscape: the phone is rotated 90°, so swap/flip to keep tilt natural.
+  const k = 0.015;
+  const ax = (isLandscape() ? (tilt.beta || 0) : (tilt.gamma || 0)) * k;
+  const ay = (isLandscape() ? -(tilt.gamma || 0) : (tilt.beta || 0)) * k;
   ball.vx = (ball.vx + ax) * 0.96;
   ball.vy = (ball.vy + ay) * 0.96;
   ball.x += ball.vx;
@@ -622,9 +667,12 @@ function step() {
 // Tilt the whole arena in 3D so it leans like the phone - same orientation as
 // the live model, but softened and angle-capped so it never turns away from you.
 function leanArena() {
-  const ang = 2 * Math.acos(Math.min(1, Math.abs(shownQuat.w))); // total tilt (rad)
+  // In landscape the board is already wide; re-express the tilt in the rotated
+  // frame (rather than spinning the canvas box) so it leans the right way.
+  const q = isLandscape() ? conjFrame(shownQuat) : shownQuat;
+  const ang = 2 * Math.acos(Math.min(1, Math.abs(q.w))); // total tilt (rad)
   const f = ang > 1e-4 ? Math.min(0.6, (30 * D2R) / ang) : 0;
-  cv.style.transform = quatToMatrix3d(nlerp(ID, shownQuat, f), prof().swap);
+  cv.style.transform = quatToMatrix3d(nlerp(ID, q, f), prof().swap);
 }
 
 function draw() {
