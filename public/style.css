@@ -163,9 +163,11 @@ a { color: var(--accent); }
 /* Blown-up, centred model while the scene is fullscreen. The class is toggled
    from JS on fullscreenchange (more reliable cross-browser than :fullscreen). */
 .scene.fs-active {
+  position: fixed; inset: 0; z-index: 9999;
   width: 100vw; height: 100vh; min-height: 0; padding: 0;
   background: radial-gradient(1200px 800px at 50% 35%, #162433 0%, #0b0e14 70%);
 }
+body.noscroll { overflow: hidden; }
 .scene.fs-active #phone3d { transform: scale(4); }
 .scene.fs-active .bed { height: 12%; }
 .scene.fs-active .ffFlash { top: 6%; font-size: 1.1rem; }

@@ -363,14 +363,19 @@ $("calibrate").addEventListener("click", () => {
   calibrateFront(false);
 });
 
-// Fullscreen the live-orientation scene (the model keeps tracking, just bigger).
+// Expand the live-orientation scene to fill the browser window (an in-page
+// overlay — not the OS fullscreen API, so the browser chrome stays put).
 const scene = document.querySelector(".scene");
-$("fsBtn").addEventListener("click", () => {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else scene.requestFullscreen?.().catch(() => {});
-});
-document.addEventListener("fullscreenchange", () => {
-  scene.classList.toggle("fs-active", document.fullscreenElement === scene);
+function setExpanded(on) {
+  scene.classList.toggle("fs-active", on);
+  document.body.classList.toggle("noscroll", on);
+  const btn = $("fsBtn");
+  btn.textContent = on ? "✕" : "⛶";
+  btn.title = on ? "Exit (Esc)" : "Expand";
+}
+$("fsBtn").addEventListener("click", () => setExpanded(!scene.classList.contains("fs-active")));
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && scene.classList.contains("fs-active")) setExpanded(false);
 });
 $("resetCal").addEventListener("click", () => {
   refQuat = ID;
