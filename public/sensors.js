@@ -27,6 +27,8 @@ function connect() {
     const m = JSON.parse(e.data);
     if (m.type === "peers") laptops.textContent = m.laptops;
     if (m.type === "haptic") buzz(m.pattern || 40);
+    // Echo latency probes straight back, carrying the laptop's own clock value.
+    if (m.type === "ping") ws.send(JSON.stringify({ type: "pong", room: ROOM, t: m.t }));
   };
 }
 connect();

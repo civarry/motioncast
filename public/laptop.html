@@ -16,6 +16,7 @@
     <div class="status">
       <span class="pill"><span id="wsDot" class="dot"></span> <span id="wsText">offline</span></span>
       <span class="pill">📱 phones: <strong id="phones">0</strong></span>
+      <span class="pill">link: <strong id="linkStat">—</strong></span>
       <span class="pill">score: <span id="score" class="score" style="font-size:1rem">0</span></span>
     </div>
   </header>
@@ -25,10 +26,14 @@
       <div class="arena-wrap">
         <canvas id="arena" width="680" height="420"></canvas>
       </div>
-      <p id="waiting" class="hint" style="margin-top:12px">
-        Waiting for a phone… open <code class="url" id="phoneUrl">/</code> on your phone (same Wi-Fi),
-        tap <strong>Start sensors</strong>, then tilt.
-      </p>
+      <div id="waiting" class="connect">
+        <div class="qr"><img id="qrImg" alt="QR code to connect your phone" /></div>
+        <div class="connect-text">
+          <p><strong>📷 Scan to connect</strong> — point your phone's camera at the code.</p>
+          <p class="hint">Or open <code class="url" id="phoneUrl">…</code> on your phone (same Wi-Fi).</p>
+          <p class="hint">Accept the certificate warning, tap <strong>Start sensors</strong>, then tilt.</p>
+        </div>
+      </div>
     </section>
 
     <aside class="side">

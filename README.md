@@ -38,6 +38,8 @@ round of Tilt Arena._
   invert toggles, a "swap roll ↔ yaw" fix, and live trim sliders.
 - **Export / import settings** — snapshot a known-good config to JSON and reload it.
 - **Haptics, both ways** — the laptop can buzz the phone; the game buzzes on pickup.
+- **Scan-to-connect** — the laptop page shows a QR code (generated locally) so a
+  phone joins without typing an IP, plus a live link readout (rate + latency).
 - **PWA** — installable, offline-capable shell, works over your LAN.
 
 ## 🚀 Quick start
@@ -49,9 +51,10 @@ npm start
 
 Then:
 1. **Laptop:** open `https://localhost:8443/laptop` (accept the self-signed cert warning).
-2. **Phone** (same Wi-Fi): open `https://<your-lan-ip>:8443/` — the start command
-   prints the exact URL. Accept the cert warning, tap **Start sensors**, and tilt.
-   On Android you can also **Install** it from the browser menu.
+2. **Phone** (same Wi-Fi): **scan the QR code** shown on the laptop page — or open
+   the `https://<your-lan-ip>:8443/` URL the start command prints. Accept the cert
+   warning, tap **Start sensors**, and tilt. On Android you can also **Install** it
+   from the browser menu.
 
 Pair multiple devices on the same channel by adding `?room=myroom` to both URLs.
 

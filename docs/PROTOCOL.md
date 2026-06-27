@@ -70,12 +70,32 @@ accepts: a single duration (ms) or an on/off array.
 The server forwards `haptic` messages only from `laptop` clients, only to
 `phone` clients in the same room.
 
+### `ping` / `pong` — latency probe
+The laptop sends `ping` with its own clock in `t`; phones echo it straight back
+as `pong` with the same `t`. The laptop computes round-trip from `t` without any
+clock synchronisation (one-way ≈ round-trip ÷ 2).
+
+```json
+{ "type": "ping", "room": "default", "t": 12345.6 }   // laptop → phones
+{ "type": "pong", "room": "default", "t": 12345.6 }   // phone  → laptops
+```
+
 ### `peers` — server → all clients in a room
 Broadcast whenever room membership changes (someone joins/leaves).
 
 ```json
 { "type": "peers", "phones": 1, "laptops": 1 }
 ```
+
+## HTTP endpoints
+
+Besides the static files and the WebSocket, the server exposes two small helpers
+the laptop page uses to onboard phones:
+
+- `GET /api/info` → `{ "ip": "192.168.x.x", "port": 8443 }` — the LAN address a
+  phone can actually reach (the laptop page may be open on `localhost`).
+- `GET /api/qr?text=<url>` → an SVG QR code for the given short string, generated
+  locally (nothing leaves the machine). Used to render the "scan to connect" code.
 
 ## Notes
 

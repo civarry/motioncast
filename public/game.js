@@ -5,11 +5,27 @@ const ROOM = new URLSearchParams(location.search).get("room") || "default";
 const $ = (id) => document.getElementById(id);
 
 const wsDot = $("wsDot"), wsText = $("wsText"), phones = $("phones");
-document.getElementById("phoneUrl").textContent = `https://${location.hostname}:${location.port}/`;
+
+// Build the phone-facing URL from the server's LAN address and render a QR for
+// it, so a phone can join by scanning instead of typing an IP.
+fetch("/api/info")
+  .then((r) => r.json())
+  .then(({ ip, port }) => {
+    const url = `https://${ip}:${port}/` + (ROOM !== "default" ? `?room=${encodeURIComponent(ROOM)}` : "");
+    $("phoneUrl").textContent = url;
+    const img = $("qrImg");
+    if (img) img.src = "/api/qr?text=" + encodeURIComponent(url);
+  })
+  .catch(() => {
+    $("phoneUrl").textContent = `https://${location.hostname}:${location.port}/`;
+  });
 
 let ws;
 let tilt = { beta: 0, gamma: 0 }; // smoothed control input
 let scoreVal = 0;
+
+// Link health: streamed frames per second + round-trip latency (ping/pong).
+let frameCount = 0, latencyMs = null, pingTimer = null;
 
 function connect() {
   ws = new WebSocket(`wss://${location.host}`);
@@ -17,10 +33,17 @@ function connect() {
     wsDot.classList.add("on");
     wsText.textContent = "connected";
     ws.send(JSON.stringify({ type: "hello", role: "laptop", room: ROOM }));
+    clearInterval(pingTimer);
+    pingTimer = setInterval(() => {
+      if (ws && ws.readyState === 1)
+        ws.send(JSON.stringify({ type: "ping", room: ROOM, t: performance.now() }));
+    }, 1000);
   };
   ws.onclose = () => {
     wsDot.classList.remove("on");
     wsText.textContent = "reconnecting…";
+    clearInterval(pingTimer);
+    latencyMs = null;
     setTimeout(connect, 1000);
   };
   ws.onmessage = (e) => {
@@ -30,10 +53,22 @@ function connect() {
       $("waiting").style.display = m.phones > 0 ? "none" : "";
       if (m.phones === 0) needZero = true; // re-zero next phone that joins
     }
-    if (m.type === "sensor") onSensor(m);
+    if (m.type === "sensor") { frameCount++; onSensor(m); }
+    // Round-trip carried the laptop's own clock, so halve for one-way latency.
+    if (m.type === "pong") latencyMs = Math.max(0, Math.round((performance.now() - m.t) / 2));
   };
 }
 connect();
+
+// Once a second, summarise link health into the header pill.
+setInterval(() => {
+  const hz = frameCount;
+  frameCount = 0;
+  const el = $("linkStat");
+  if (!el) return;
+  if (hz === 0) { el.textContent = "—"; latencyMs = null; }
+  else el.textContent = `${hz} Hz` + (latencyMs != null ? ` · ${latencyMs} ms` : "");
+}, 1000);
 
 function sendHaptic(pattern) {
   if (ws && ws.readyState === 1)

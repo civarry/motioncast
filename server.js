@@ -7,6 +7,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { networkInterfaces } from "node:os";
 import selfsigned from "selfsigned";
 import { WebSocketServer } from "ws";
+import QRCode from "qrcode";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8443;
@@ -55,6 +56,22 @@ app.use(express.static(join(__dirname, "public")));
 app.get(["/laptop", "/laptop.html"], (_req, res) =>
   res.sendFile(join(__dirname, "public", "laptop.html"))
 );
+
+// LAN address so the laptop page can build a phone-reachable URL + QR code.
+app.get("/api/info", (_req, res) => res.json({ ip: IP, port: PORT }));
+
+// Render a QR code (SVG) for an arbitrary short string — used to onboard phones
+// without typing the LAN IP. Generated locally, nothing leaves the machine.
+app.get("/api/qr", async (req, res) => {
+  const text = (req.query.text || "").toString().slice(0, 512);
+  if (!text) return res.status(400).end();
+  try {
+    const svg = await QRCode.toString(text, { type: "svg", margin: 1 });
+    res.type("svg").set("Cache-Control", "no-store").send(svg);
+  } catch {
+    res.status(500).end();
+  }
+});
 
 const server = https.createServer(
   { key: readFileSync(keyPath), cert: readFileSync(crtPath) },
@@ -115,6 +132,17 @@ wss.on("connection", (ws) => {
     // Laptop -> phones: haptic feedback requests
     if (data.type === "haptic" && ws.role === "laptop") {
       broadcast(ws.room, (c) => c.role === "phone", data);
+      return;
+    }
+
+    // Latency probe: laptop pings phones, each echoes it back as a pong. The
+    // laptop carries its own clock in `t`, so round-trip needs no clock sync.
+    if (data.type === "ping" && ws.role === "laptop") {
+      broadcast(ws.room, (c) => c.role === "phone", data);
+      return;
+    }
+    if (data.type === "pong" && ws.role === "phone") {
+      broadcast(ws.room, (c) => c.role === "laptop", data);
       return;
     }
   });
