@@ -3,7 +3,7 @@
 The server (`server.js`) is a thin **relay**. Clients connect over
 `wss://<host>` and join a **room**; the server forwards messages between the
 phones and laptops in that room. There is no central state beyond room
-membership — every message is a single JSON object with a `type` field.
+membership - every message is a single JSON object with a `type` field.
 
 This doc is enough to write your own client (a custom controller, a different
 receiver, a logger, a native bridge, etc.).
@@ -19,9 +19,9 @@ default port is `8443`.
 
 ## Roles & rooms
 
-- **role** — `"phone"` (a sensor source) or `"laptop"` (a receiver). Anything
+- **role** - `"phone"` (a sensor source) or `"laptop"` (a receiver). Anything
   other than `"laptop"` is treated as `"phone"`.
-- **room** — a string channel (max 32 chars). Clients only exchange messages
+- **room** - a string channel (max 32 chars). Clients only exchange messages
   with others in the same room. Defaults to `"default"`; pick one with
   `?room=myroom` in the page URL.
 
@@ -29,15 +29,15 @@ Sensor frames flow **phone → laptops**. Haptic commands flow **laptop → phon
 
 ## Messages
 
-### `hello` — client → server (required first message)
+### `hello` - client → server (required first message)
 Registers the connection's role and room. Send this immediately on open.
 
 ```json
 { "type": "hello", "role": "phone", "room": "default" }
 ```
 
-### `sensor` — phone → laptops
-Coalesced sensor frame, sent ~30 Hz. All sensor fields are optional — only what
+### `sensor` - phone → laptops
+Coalesced sensor frame, sent ~30 Hz. All sensor fields are optional - only what
 the device exposes is present.
 
 ```json
@@ -52,13 +52,13 @@ the device exposes is present.
 }
 ```
 
-- **Prefer the quaternion** (`qx,qy,qz,qw`) when present — it's gimbal-lock free.
+- **Prefer the quaternion** (`qx,qy,qz,qw`) when present - it's gimbal-lock free.
   Fall back to Euler `alpha/beta/gamma` otherwise. Note the two sources use
   different axis conventions (yaw/roll are swapped between them).
 - The server forwards `sensor` messages only from `phone` clients, only to
   `laptop` clients in the same room.
 
-### `haptic` — laptop → phones
+### `haptic` - laptop → phones
 Asks phones in the room to vibrate. `pattern` is anything
 [`navigator.vibrate`](https://developer.mozilla.org/docs/Web/API/Navigator/vibrate)
 accepts: a single duration (ms) or an on/off array.
@@ -70,7 +70,7 @@ accepts: a single duration (ms) or an on/off array.
 The server forwards `haptic` messages only from `laptop` clients, only to
 `phone` clients in the same room.
 
-### `calibrate` — phone → laptops
+### `calibrate` - phone → laptops
 Asks the laptop(s) to treat the phone's **current pose** as "straight ahead"
 (the orientation reference). Lets you calibrate from the phone in hand without
 reaching for the laptop.
@@ -81,7 +81,7 @@ reaching for the laptop.
 
 Forwarded only from `phone` clients to `laptop` clients in the same room.
 
-### `ping` / `pong` — latency probe
+### `ping` / `pong` - latency probe
 The laptop sends `ping` with its own clock in `t`; phones echo it straight back
 as `pong` with the same `t`. The laptop computes round-trip from `t` without any
 clock synchronisation (one-way ≈ round-trip ÷ 2).
@@ -91,7 +91,7 @@ clock synchronisation (one-way ≈ round-trip ÷ 2).
 { "type": "pong", "room": "default", "t": 12345.6 }   // phone  → laptops
 ```
 
-### `peers` — server → all clients in a room
+### `peers` - server → all clients in a room
 Broadcast whenever room membership changes (someone joins/leaves).
 
 ```json
@@ -103,7 +103,7 @@ Broadcast whenever room membership changes (someone joins/leaves).
 Besides the static files and the WebSocket, the server exposes two small helpers
 the laptop page uses to onboard phones:
 
-- `GET /api/info` → `{ "ip": "192.168.x.x", "port": 8443 }` — the LAN address a
+- `GET /api/info` → `{ "ip": "192.168.x.x", "port": 8443 }` - the LAN address a
   phone can actually reach (the laptop page may be open on `localhost`).
 - `GET /api/qr?text=<url>` → an SVG QR code for the given short string, generated
   locally (nothing leaves the machine). Used to render the "scan to connect" code.
@@ -111,7 +111,7 @@ the laptop page uses to onboard phones:
 ## Notes
 
 - Unknown message types are ignored. Malformed JSON is dropped silently.
-- There's no auth — it's meant for your own LAN. Don't expose it to the public
+- There's no auth - it's meant for your own LAN. Don't expose it to the public
   internet as-is.
 - The relay is symmetric and stateless per-message, so adding new message types
   (e.g. a `chat` or `command` channel) is mostly a matter of teaching

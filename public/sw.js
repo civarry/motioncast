@@ -34,7 +34,7 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.protocol === "wss:") return;
-  if (url.pathname.startsWith("/api/")) return; // dynamic (info/QR) — never cache
+  if (url.pathname.startsWith("/api/")) return; // dynamic (info/QR) - never cache
 
   // Network-first: fetch fresh, refresh the cache, fall back to cache offline.
   e.respondWith(

@@ -4,14 +4,14 @@
   "activeSource": "euler",
   "profiles": {
     "euler": {
-      "_device": "iPhone (Safari) — no Generic Sensor API, uses deviceorientation Euler angles",
+      "_device": "iPhone (Safari) - no Generic Sensor API, uses deviceorientation Euler angles",
       "_screenMap": "swap=false → M = Rx(90°)·diag(1,-1,1)",
       "invert": { "pitch": false, "roll": true, "yaw": true },
       "trim": { "pitch": 0, "roll": 0, "yaw": 0 },
       "swap": false
     },
     "quaternion": {
-      "_device": "Android (Chrome) — RelativeOrientationSensor quaternion",
+      "_device": "Android (Chrome) - RelativeOrientationSensor quaternion",
       "_screenMap": "swap=true → M = diag(1,-1,1) (yaw/roll swapped vs Euler)",
       "invert": { "pitch": false, "roll": false, "yaw": false },
       "trim": { "pitch": 0, "roll": 0, "yaw": 0 },

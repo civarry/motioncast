@@ -60,7 +60,7 @@ app.get(["/laptop", "/laptop.html"], (_req, res) =>
 // LAN address so the laptop page can build a phone-reachable URL + QR code.
 app.get("/api/info", (_req, res) => res.json({ ip: IP, port: PORT }));
 
-// Render a QR code (SVG) for an arbitrary short string — used to onboard phones
+// Render a QR code (SVG) for an arbitrary short string - used to onboard phones
 // without typing the LAN IP. Generated locally, nothing leaves the machine.
 app.get("/api/qr", async (req, res) => {
   const text = (req.query.text || "").toString().slice(0, 512);
@@ -165,7 +165,7 @@ server.listen(PORT, () => {
   console.log("\n  MotionCast running\n");
   console.log("  On this computer (receiver + demo):");
   console.log(`    https://localhost:${PORT}/laptop\n`);
-  console.log("  On your phone (the caster) — same Wi-Fi network:");
+  console.log("  On your phone (the caster) - same Wi-Fi network:");
   console.log(`    https://${IP}:${PORT}/\n`);
   console.log("  Accept the self-signed cert warning on first visit.\n");
 });

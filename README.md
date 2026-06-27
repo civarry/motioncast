@@ -1,141 +1,118 @@
-# 📡 MotionCast
+# MotionCast
 
-**Cast your phone's motion to any screen.** Open a web page on your phone and its
-**orientation**, **accelerometer/gyroscope**, and **haptics** stream live to your
-computer over a local HTTPS + WebSocket link — no app store, no native build.
-Installable as a **PWA**.
+**Turn your phone into a real-time motion source for any computer.**
 
-MotionCast is a **foundation for building motion-driven things**: controllers,
-remotes, games, gesture tools, visualizers. It ships with a live **3D phone
-model** that mirrors your device's real orientation (gimbal-free, with calibration
-profiles), and a built-in demo — **Tilt Arena** — to show the sensor stream in
-action: you roll a ball across a 3D-tilting board by leaning the phone, and the
-phone buzzes when you grab a target.
+Open a web page on your phone, and its orientation, accelerometer/gyroscope, and
+haptics stream live to your computer over a local HTTPS + WebSocket link. No app
+store, no native build, no SDK. It installs as a PWA and works on the same Wi-Fi.
 
-> The game is just the friendly intro. The real product is the **calibrated,
-> cross-platform sensor stream** — see [Ideas](#-ideas--roadmap) for what to build
-> on it, and [docs/PROTOCOL.md](docs/PROTOCOL.md) to write your own client.
+MotionCast is a foundation for anything motion-driven: controllers, remotes,
+games, gesture tools, visualizers. It ships with a gimbal-free 3D model that
+mirrors your phone's real pose, and a small demo game, Tilt Arena, so you can see
+the sensor stream working in seconds.
 
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
+&nbsp;Node 18+ · zero frontend frameworks
 
-## 🎬 Demo
+<!-- Add a demo GIF here once recorded: ![MotionCast demo](docs/demo.gif) -->
 
-<!-- TODO: drop a screenshot / GIF here. Record the laptop page (3D model + Tilt
-     Arena) while tilting the phone, e.g. into docs/demo.gif, then:
-     ![MotionCast demo](docs/demo.gif) -->
-
-_Screenshots / GIF coming soon — record the 3D model tracking your phone and a
-round of Tilt Arena._
-
----
-
-## ✨ Features
-
-- **Live 3D orientation** — a CSS-3D phone model tracks the device's real pose.
-- **Gimbal-lock-free** — uses the Generic Sensor API quaternion when available
-  (Android/Chrome), with a Euler `deviceorientation` fallback (iOS/Safari).
-- **Per-device calibration profiles** — the two sensor APIs use different axis
-  conventions, so the laptop auto-detects the source and applies a matching
-  profile (axis mapping + inverts + trims). Settings persist per device type.
-- **Guided setup + fine-tuning** — a step-by-step calibration wizard, per-axis
-  invert toggles, a "swap roll ↔ yaw" fix, and live trim sliders.
-- **Export / import settings** — snapshot a known-good config to JSON and reload it.
-- **Haptics, both ways** — the laptop can buzz the phone; the game buzzes on pickup.
-- **Scan-to-connect** — the laptop page shows a QR code (generated locally) so a
-  phone joins without typing an IP, plus a live link readout (rate + latency).
-- **PWA** — installable, offline-capable shell, works over your LAN.
-
-## 🚀 Quick start
+## Quick start
 
 ```bash
 npm install
 npm start
 ```
 
-Then:
-1. **Laptop:** open `https://localhost:8443/laptop` (accept the self-signed cert warning).
-2. **Phone** (same Wi-Fi): **scan the QR code** shown on the laptop page — or open
-   the `https://<your-lan-ip>:8443/` URL the start command prints. Accept the cert
-   warning, tap **Start sensors**, and tilt. On Android you can also **Install** it
-   from the browser menu.
+1. **Computer:** open `https://localhost:8443/laptop` and accept the self-signed
+   certificate warning.
+2. **Phone** (same Wi-Fi): scan the QR code shown on that page, or open the
+   `https://<your-lan-ip>:8443/` URL the start command prints. Accept the cert
+   warning, tap **Start sensors**, and tilt.
 
-Pair multiple devices on the same channel by adding `?room=myroom` to both URLs.
+That's it. Tilt your phone and watch the 3D model and the demo track it live.
+
+> Add `?room=name` to both URLs to run several independent sessions at once.
+
+## Features
+
+- **Live 3D orientation.** A 3D phone model mirrors your device's real pose in
+  real time.
+- **Gimbal-lock free.** Uses the Generic Sensor API quaternion where available
+  (Android/Chrome), with a `deviceorientation` Euler fallback (iOS/Safari).
+- **Auto-calibration per device.** The two sensor APIs use different axis
+  conventions, so MotionCast detects the source and applies a matching profile
+  (axis mapping, inverts, trims) automatically.
+- **Calibrate from anywhere.** A guided setup wizard, fine-tune sliders, and a
+  one-tap calibrate-front on both the phone and the computer.
+- **Two-way haptics.** The computer can buzz the phone, and the phone buzzes on
+  in-game events.
+- **Scan to connect.** A locally generated QR code joins a phone instantly,
+  without typing IP addresses, plus a live readout of stream rate and latency.
+- **Installable PWA.** Offline-capable shell, no app store.
+
+## How it works
+
+```
+ Phone (PWA)                     Server (Node)                  Computer (browser)
+ -----------                     -------------                  ------------------
+ sensors.js  --- sensor frames -->  server.js  --- relay --->   game.js
+   quaternion / euler                HTTPS static host            3D model + game
+   haptics      <-- haptic / ping -- WebSocket relay (rooms)  --- calibration UI
+```
+
+- **Transport.** An Express server serves the PWA over HTTPS and runs a WebSocket
+  relay. Clients join a room; phones broadcast sensor frames to computers, and
+  computers send haptic commands back.
+- **Orientation.** Device orientation is handled as quaternions to avoid gimbal
+  lock. Calibration is a relative rotation, smoothed and rendered with a CSS
+  `matrix3d` transform that maps the device axes to the screen.
+- **Open protocol.** The WebSocket message format is documented in
+  [`docs/PROTOCOL.md`](docs/PROTOCOL.md), which is enough to write your own client.
 
 ### Why HTTPS?
-Browser motion sensors (`DeviceMotion` / `DeviceOrientation` / Generic Sensor API)
-only work in a **secure context**. A laptop LAN IP over plain `http://` is not
-secure, so the server runs HTTPS with a self-signed cert that's generated
-automatically into `.cert/` on first run.
 
-## 🧭 Calibration & tuning
+Browser motion sensors only work in a secure context, and a LAN IP over plain
+`http://` does not qualify. The server runs HTTPS with a self-signed certificate
+generated automatically into `.cert/` on first run.
 
-- **Calibrate front** — hold the phone the way you want "straight ahead," then tap it.
-- **Guided setup** — walks you through pitch (nod), yaw (door hinge), and roll
-  (spin), confirming each axis matches with ✓ / ✗.
-- **Swap roll ↔ yaw** — one-tap fix if a device has those two axes crossed.
-- **Trim sliders** — small per-axis degree offsets for minor misalignment.
-- **Export / Import** — under *Advanced*, save/restore the full profile set.
-  A `known-good-settings.json` baseline (iPhone + Android) is included.
+## Calibration
 
-## 🏗️ How it works
+- **Calibrate front.** Hold the phone how you want "straight ahead," then tap
+  (on the phone or the computer).
+- **Guided setup.** Confirms each axis (pitch, yaw, roll) one at a time.
+- **Fine-tuning.** Per-axis invert toggles, a roll/yaw swap, and trim sliders,
+  all under *Advanced*.
+- **Export / import.** Save a known-good profile to JSON and reload it. A baseline
+  for iPhone and Android is included in `known-good-settings.json`.
 
-```
- Phone (PWA)                    Server (Node)                 Laptop (browser)
- ─────────────                  ─────────────                 ────────────────
- sensors.js  ──sensor frames──▶  server.js  ──relay (room)──▶  game.js
-   • Generic Sensor quaternion    • HTTPS static host          • 3D model (CSS matrix3d)
-   • deviceorientation fallback   • WebSocket relay            • calibration profiles
-   • navigator.vibrate      ◀──haptic commands───────────────  • Tilt Arena game
-```
-
-- **Transport:** an Express HTTPS server serves the static PWA and runs a
-  `ws` WebSocket relay. Clients join a *room*; phones broadcast sensor frames to
-  laptops, laptops send haptic commands back to phones.
-- **Orientation math:** device orientation is handled as **quaternions** to avoid
-  gimbal lock. Calibration is a relative rotation (`conj(ref) · live`), smoothed
-  with normalized lerp, and rendered via a `matrix3d` CSS transform. The
-  device→screen mapping handles CSS's Y-down axis and the yaw/roll convention
-  difference between sensor APIs.
-
-The WebSocket message format is documented in **[docs/PROTOCOL.md](docs/PROTOCOL.md)** —
-enough to write your own controller or receiver.
-
-## 📁 Project structure
+## Project structure
 
 ```
-server.js                     HTTPS static host + WebSocket relay
+server.js                  HTTPS static host + WebSocket relay
 public/
-  index.html + sensors.js     phone controller (the PWA)
-  laptop.html + game.js       laptop receiver + Tilt Arena + calibration UI
-  style.css                   dark neon theme + 3D model styles
-  manifest.webmanifest, sw.js, icon*.svg   PWA install assets
-known-good-settings.json      importable iPhone + Android calibration baseline
+  index.html, sensors.js   phone controller (PWA)
+  laptop.html, game.js     receiver + 3D model + calibration UI + Tilt Arena
+  style.css                styles
+  manifest.webmanifest, sw.js, icon*.svg
+docs/PROTOCOL.md           WebSocket message reference
 ```
 
-## 💡 Ideas & roadmap
+## Roadmap
 
-This is a foundation — a lot can be built on the sensor stream:
+The sensor stream is the hard part, and it's done. Things to build on it:
 
-- Map yaw/pitch to **mouse / cursor** or media keys via a native helper.
-- **Air-mouse / presentation remote** (point + click + gesture to advance slides).
-- **Motion gestures** from `rotationRate` / acceleration (flick, shake, chop).
-- **Two-phone multiplayer** in the same room; more games.
-- **Recording & playback** of sensor sessions for analysis.
-- **VR/AR-style head or controller tracking** in the browser.
-- A small **WebSocket API doc** so other clients can consume the stream.
+- A native bridge that maps motion to real mouse/keyboard input (air-mouse,
+  presentation remote, accessibility input).
+- Gesture recognition from rotation rate and acceleration (flick, shake, chop).
+- Recording and playback of sensor sessions for analysis or ML datasets.
+- Multiplayer (multiple phones in one room) and more demos.
+- Public deployment on a WebSocket-friendly host for use beyond the LAN.
 
-PRs and ideas welcome.
+## Contributing
 
-## 🤝 Contributing
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and
+guidelines. The project is intentionally dependency-light and framework-free.
 
-PRs and ideas welcome — see **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup,
-project layout, and guidelines. The short version:
-
-1. Fork and clone.
-2. `npm install && npm start`.
-3. Open `https://localhost:8443/laptop` and pair a phone on the same Wi-Fi.
-4. Send a PR. Keep it dependency-light and framework-free where possible.
-
-## 📜 License
+## License
 
 [MIT](LICENSE) © civarry

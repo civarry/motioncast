@@ -70,7 +70,7 @@ setInterval(() => {
   frameCount = 0;
   const el = $("linkStat");
   if (!el) return;
-  if (hz === 0) { el.textContent = "—"; latencyMs = null; }
+  if (hz === 0) { el.textContent = "-"; latencyMs = null; }
   else el.textContent = `${hz} Hz` + (latencyMs != null ? ` · ${latencyMs} ms` : "");
 }, 1000);
 
@@ -91,7 +91,7 @@ const ID = { w: 1, x: 0, y: 0, z: 0 };
 // ---- Per-source orientation profiles ----------------------------------------
 // Android's Generic Sensor API and iOS's Euler deviceorientation use different
 // axis conventions (yaw & roll are swapped between them). So each sensor source
-// keeps its OWN profile — axis mapping (swap), per-axis inverts, and trims — and
+// keeps its OWN profile - axis mapping (swap), per-axis inverts, and trims - and
 // the laptop auto-switches to the matching one when a phone connects.
 function defaultProfile() {
   return {
@@ -125,7 +125,7 @@ function mergeProfile(target, src) {
 const saveProfiles = () => localStorage.setItem("orient-profiles-v1", JSON.stringify(profiles));
 
 let sourceKey = "euler";        // which profile is active right now
-let lastSource = "—";           // human-readable sensor path for the debug panel
+let lastSource = "-";           // human-readable sensor path for the debug panel
 const prof = () => profiles[sourceKey];
 // Screen-axis → quaternion-component mapping depends on the active swap.
 const rollComp = () => (prof().swap ? "z" : "y");
@@ -169,7 +169,7 @@ function trimQuat() {
   const qz = { w: Math.cos(hz), x: 0, y: 0, z: Math.sin(hz) };
   return qmul(qmul(qx, qy), qz);
 }
-// Normalized lerp toward target — cheap smoothing/jitter damping.
+// Normalized lerp toward target - cheap smoothing/jitter damping.
 function nlerp(a, b, t) {
   if (a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z < 0) b = { w: -b.w, x: -b.x, y: -b.y, z: -b.z };
   const q = { w: a.w + (b.w - a.w) * t, x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t };
@@ -351,8 +351,8 @@ function calibrateFront(fromPhone) {
   );
   const note = $("calNote");
   note.textContent = fromPhone
-    ? "Calibrated from the phone ✓ — this pose is now “straight ahead.”"
-    : "Calibrated ✓ — this pose is now “straight ahead.”";
+    ? "Calibrated from the phone ✓ - this pose is now “straight ahead.”"
+    : "Calibrated ✓ - this pose is now “straight ahead.”";
   note.classList.remove("flash");
   void note.offsetWidth;       // restart the animation
   note.classList.add("flash"); // visible pulse so a remote calibrate is obvious
@@ -364,7 +364,7 @@ $("calibrate").addEventListener("click", () => {
 });
 
 // Expand the live-orientation scene to fill the browser window (an in-page
-// overlay — not the OS fullscreen API, so the browser chrome stays put).
+// overlay - not the OS fullscreen API, so the browser chrome stays put).
 const scene = document.querySelector(".scene");
 function setExpanded(on) {
   scene.classList.toggle("fs-active", on);
@@ -380,10 +380,10 @@ document.addEventListener("keydown", (e) => {
 $("resetCal").addEventListener("click", () => {
   refQuat = ID;
   needZero = true;
-  $("calNote").textContent = "Calibration reset — re-zeroing to your current pose.";
+  $("calNote").textContent = "Calibration reset - re-zeroing to your current pose.";
 });
 
-// Per-axis invert toggles — operate on the active profile.
+// Per-axis invert toggles - operate on the active profile.
 ["pitch", "roll", "yaw"].forEach((axis) => {
   $("inv-" + axis).addEventListener("click", () => {
     prof().invert[axis] = !prof().invert[axis];
@@ -393,7 +393,7 @@ $("resetCal").addEventListener("click", () => {
 });
 const syncInvert = (axis) => $("inv-" + axis).classList.toggle("active", prof().invert[axis]);
 
-// Swap roll ↔ yaw — corrects the axis convention for the active device profile.
+// Swap roll ↔ yaw - corrects the axis convention for the active device profile.
 $("swapAxes").addEventListener("click", () => {
   prof().swap = !prof().swap;
   saveProfiles();
@@ -494,20 +494,20 @@ $("importFile").addEventListener("change", async (e) => {
 const wizSteps = [
   {
     kind: "neutral",
-    text: "① Hold the phone UPRIGHT (portrait), screen facing you — the pose you want as “straight ahead.” Then set it as front.",
+    text: "① Hold the phone UPRIGHT (portrait), screen facing you - the pose you want as “straight ahead.” Then set it as front.",
     primary: "Set as front",
   },
   {
     kind: "axis", axis: "pitch",
-    text: "② PITCH — nod it: tilt the TOP edge toward you, then away. Does the on-screen phone lean the same direction?",
+    text: "② PITCH - nod it: tilt the TOP edge toward you, then away. Does the on-screen phone lean the same direction?",
   },
   {
     kind: "axis", axis: "yaw",
-    text: "③ YAW — like a door on a hinge: keep it upright and facing you, swing the LEFT edge toward you. Does the model turn the same way?",
+    text: "③ YAW - like a door on a hinge: keep it upright and facing you, swing the LEFT edge toward you. Does the model turn the same way?",
   },
   {
     kind: "axis", axis: "roll",
-    text: "④ ROLL — spin it in its own plane toward landscape: drop the RIGHT edge down. Does the model tilt the same diagonal way?",
+    text: "④ ROLL - spin it in its own plane toward landscape: drop the RIGHT edge down. Does the model tilt the same diagonal way?",
   },
   {
     kind: "done",
@@ -577,7 +577,7 @@ wizSecondary.addEventListener("click", () => {
   renderWizStep();
 });
 
-const fmt = (n) => (n == null ? "–" : n.toFixed(0) + "°");
+const fmt = (n) => (n == null ? "-" : n.toFixed(0) + "°");
 
 // ---------- Game ----------
 const cv = $("arena");
@@ -619,7 +619,7 @@ function step() {
   requestAnimationFrame(step);
 }
 
-// Tilt the whole arena in 3D so it leans like the phone — same orientation as
+// Tilt the whole arena in 3D so it leans like the phone - same orientation as
 // the live model, but softened and angle-capped so it never turns away from you.
 function leanArena() {
   const ang = 2 * Math.acos(Math.min(1, Math.abs(shownQuat.w))); // total tilt (rad)

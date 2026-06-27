@@ -44,16 +44,16 @@ function buzz(pattern) {
 }
 $("buzzBtn").addEventListener("click", () => buzz([20, 60, 20]));
 
-// Ask the laptop to treat the phone's current pose as "straight ahead" — the
+// Ask the laptop to treat the phone's current pose as "straight ahead" - the
 // pose at the moment of the tap, same as the laptop's own Calibrate button.
 $("calBtn").addEventListener("click", () => {
   if (ws && ws.readyState === 1) {
     ws.send(JSON.stringify({ type: "calibrate", room: ROOM }));
     console.log("[motioncast] calibrate message SENT to laptop");
     buzz([15, 40, 15]);
-    permNote.textContent = "Calibrated front ✓ — this pose is now the laptop's reference.";
+    permNote.textContent = "Calibrated front ✓ - this pose is now the laptop's reference.";
   } else {
-    permNote.textContent = "Not connected yet — wait for the link, then calibrate.";
+    permNote.textContent = "Not connected yet - wait for the link, then calibrate.";
   }
 });
 document.querySelectorAll("[data-buzz]").forEach((b) =>
@@ -78,10 +78,10 @@ function onMotion(e) {
   $("ay").textContent = fmt(a.y);
   $("az").textContent = fmt(a.z);
 }
-const fmt = (n) => (n == null ? "–" : n.toFixed(1));
+const fmt = (n) => (n == null ? "-" : n.toFixed(1));
 
 // True orientation quaternion straight from sensor fusion. Euler alpha/beta/
-// gamma go ambiguous when the phone is upright (gimbal lock — yaw and roll
+// gamma go ambiguous when the phone is upright (gimbal lock - yaw and roll
 // become indistinguishable). The Generic Sensor API quaternion has no such
 // blind spot, so we stream it for the live 3D model when the phone supports it.
 let orientationSensor = null;
@@ -118,7 +118,7 @@ async function start() {
     buzz(20);
     $("startBtn").textContent = "Streaming ✓";
     $("startBtn").disabled = true;
-    permNote.textContent = "Move and tilt your phone — the laptop is listening.";
+    permNote.textContent = "Move and tilt your phone - the laptop is listening.";
   } catch (err) {
     permNote.textContent =
       "Could not access sensors: " + err.message +

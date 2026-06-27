@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest! This is a small, dependency-light project — the goal
+Thanks for your interest! This is a small, dependency-light project - the goal
 is to keep it easy to read, hack on, and learn from.
 
 ## Getting started
@@ -17,7 +17,7 @@ Then:
 2. **Phone** (same Wi-Fi): open the `https://<lan-ip>:8443/` URL the start command
    prints, tap **Start sensors**, and tilt.
 
-You need a real phone to test sensors — desktop browsers don't emit motion data.
+You need a real phone to test sensors - desktop browsers don't emit motion data.
 Android/Chrome exercises the Generic Sensor (quaternion) path; iOS/Safari
 exercises the Euler `deviceorientation` fallback. Testing on both is ideal,
 since they use different axis conventions.
@@ -39,7 +39,7 @@ since they use different axis conventions.
   way unless there's a strong reason not to.
 - **Keep dependencies minimal.** The runtime deps are just `express`,
   `selfsigned`, and `ws`.
-- **Match the surrounding style** — comments explain the *why* (especially the
+- **Match the surrounding style** - comments explain the *why* (especially the
   orientation math), naming is descriptive, no clever one-liners that hide intent.
 - **Orientation changes:** if you touch the quaternion ↔ screen mapping, test
   pitch, yaw, and roll independently on **both** a quaternion device and a Euler

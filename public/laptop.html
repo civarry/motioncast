@@ -4,33 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0e14" />
-  <title>MotionCast — Receiver</title>
+  <title>MotionCast - Receiver</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body class="laptop">
   <header class="topbar panel">
     <div class="brand">
       <h1>MotionCast</h1>
-      <p class="sub">Your phone's motion, orientation &amp; haptics — live on this screen.</p>
+      <p class="sub">Your phone's motion, orientation &amp; haptics - live on this screen.</p>
     </div>
     <div class="status">
       <span class="pill"><span id="wsDot" class="dot"></span> <span id="wsText">offline</span></span>
       <span class="pill">phones: <strong id="phones">0</strong></span>
-      <span class="pill">link: <strong id="linkStat">—</strong></span>
+      <span class="pill">link: <strong id="linkStat">-</strong></span>
       <span class="pill">score: <span id="score" class="score" style="font-size:1rem">0</span></span>
     </div>
   </header>
 
   <main class="dash">
     <section class="panel game">
-      <h2 style="margin-bottom:10px">Demo — Tilt Arena <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">· roll the ball by tilting your phone</span></h2>
+      <h2 style="margin-bottom:10px">Demo - Tilt Arena <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">· roll the ball by tilting your phone</span></h2>
       <div class="arena-wrap">
         <canvas id="arena" width="480" height="760"></canvas>
       </div>
       <div id="waiting" class="connect">
         <div class="qr"><img id="qrImg" alt="QR code to connect your phone" /></div>
         <div class="connect-text">
-          <p><strong>Scan to connect</strong> — point your phone's camera at the code.</p>
+          <p><strong>Scan to connect</strong> - point your phone's camera at the code.</p>
           <p class="hint">Or open <code class="url" id="phoneUrl">…</code> on your phone (same Wi-Fi).</p>
           <p class="hint">Accept the certificate warning, tap <strong>Start sensors</strong>, then tilt.</p>
         </div>
@@ -60,8 +60,8 @@
         </div>
         <div class="dropHud">
           <span class="g" id="gMeter">1.00 g</span>
-          <span id="airtime">— ms air</span>
-          <span id="peakG">peak — g</span>
+          <span id="airtime">- ms air</span>
+          <span id="peakG">peak - g</span>
         </div>
         <div class="row" style="margin-top:10px">
           <button id="wizStart" class="primary">Guided setup</button>
@@ -87,23 +87,23 @@
           <button id="swapAxes" class="toggle">Swap roll ↔ yaw</button>
         </div>
         <p class="hint" style="margin-top:6px">
-          Settings auto-switch per device type — active profile:
-          <strong id="profileLabel">—</strong>
+          Settings auto-switch per device type - active profile:
+          <strong id="profileLabel">-</strong>
         </p>
         <p class="hint" id="calNote" style="margin-top:8px">
           Hold the phone facing you the way you want “straight ahead,” then tap
           <strong>Calibrate front</strong>.
         </p>
         <div class="grid" style="margin-top:8px">
-          <div class="stat"><div class="k">β pitch</div><div class="v" id="beta">–</div></div>
-          <div class="stat"><div class="k">γ roll</div><div class="v" id="gamma">–</div></div>
-          <div class="stat"><div class="k">α yaw</div><div class="v" id="alpha">–</div></div>
+          <div class="stat"><div class="k">β pitch</div><div class="v" id="beta">-</div></div>
+          <div class="stat"><div class="k">γ roll</div><div class="v" id="gamma">-</div></div>
+          <div class="stat"><div class="k">α yaw</div><div class="v" id="alpha">-</div></div>
         </div>
 
         <details id="advanced" class="advanced">
           <summary>Advanced · live values &amp; fine-tuning</summary>
           <p class="hint" style="margin:10px 0 4px">
-            Sensor source: <strong id="dbgSource">–</strong>
+            Sensor source: <strong id="dbgSource">-</strong>
           </p>
           <div class="trims">
             <div class="trim">
