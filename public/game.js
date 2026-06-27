@@ -34,11 +34,11 @@ if (onLocalhost) {
   // Local dev: the laptop is on localhost, but the phone needs the LAN IP.
   fetch("/api/info")
     .then((r) => r.json())
-    .then(({ ip, port }) => setPhoneUrl(`https://${ip}:${port}/${roomQS}`))
-    .catch(() => setPhoneUrl(`${location.origin}/${roomQS}`));
+    .then(({ ip, port }) => setPhoneUrl(`https://${ip}:${port}/phone${roomQS}`))
+    .catch(() => setPhoneUrl(`${location.origin}/phone${roomQS}`));
 } else {
   // Deployed: the public origin is already reachable from the phone.
-  setPhoneUrl(`${location.origin}/${roomQS}`);
+  setPhoneUrl(`${location.origin}/phone${roomQS}`);
 }
 // Local dev needs the "same Wi-Fi" + self-signed cert caveats; a real deployment
 // (valid TLS, public URL) does not.

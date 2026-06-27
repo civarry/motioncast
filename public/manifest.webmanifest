@@ -2,7 +2,7 @@
   "name": "MotionCast",
   "short_name": "MotionCast",
   "description": "Cast your phone's motion, orientation and haptics to your computer in real time.",
-  "start_url": "/",
+  "start_url": "/phone",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b0e14",

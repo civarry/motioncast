@@ -57,10 +57,14 @@ if (!isCloud && (!existsSync(keyPath) || !existsSync(crtPath))) {
 }
 
 const app = express();
-app.use(express.static(join(__dirname, "public")));
-app.get(["/laptop", "/laptop.html"], (_req, res) =>
-  res.sendFile(join(__dirname, "public", "laptop.html"))
-);
+// index:false so "/" falls through to our routes: the desktop RECEIVER is the
+// root (what a person visiting the site sees), and the phone CONTROLLER lives at
+// /phone (where the QR points). Other static assets still serve normally.
+app.use(express.static(join(__dirname, "public"), { index: false }));
+
+const page = (name) => (_req, res) => res.sendFile(join(__dirname, "public", name));
+app.get(["/", "/laptop", "/laptop.html"], page("laptop.html"));
+app.get(["/phone", "/cast"], page("index.html"));
 
 // LAN address so the laptop page can build a phone-reachable URL + QR code.
 app.get("/api/info", (_req, res) => res.json({ ip: IP, port: PORT }));
@@ -172,9 +176,9 @@ server.listen(PORT, () => {
   }
   console.log("\n  MotionCast running\n");
   console.log("  On this computer (receiver + demo):");
-  console.log(`    https://localhost:${PORT}/laptop\n`);
+  console.log(`    https://localhost:${PORT}/\n`);
   console.log("  On your phone (the caster) - same Wi-Fi network:");
-  console.log(`    https://${IP}:${PORT}/\n`);
+  console.log(`    https://${IP}:${PORT}/phone\n`);
   console.log("  Accept the self-signed cert warning on first visit.\n");
 });
 

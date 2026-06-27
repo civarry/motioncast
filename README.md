@@ -23,11 +23,11 @@ npm install
 npm start
 ```
 
-1. **Computer:** open `https://localhost:8443/laptop` and accept the self-signed
-   certificate warning.
+1. **Computer:** open `https://localhost:8443/` (the receiver) and accept the
+   self-signed certificate warning.
 2. **Phone** (same Wi-Fi): scan the QR code shown on that page, or open the
-   `https://<your-lan-ip>:8443/` URL the start command prints. Accept the cert
-   warning, tap **Start sensors**, and tilt.
+   `https://<your-lan-ip>:8443/phone` URL the start command prints. Accept the
+   cert warning, tap **Start sensors**, and tilt.
 
 That's it. Tilt your phone and watch the 3D model and the demo track it live.
 
