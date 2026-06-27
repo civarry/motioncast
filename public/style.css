@@ -39,15 +39,17 @@ body.laptop { max-width: 1500px; padding: 16px; }
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(330px, 1fr);
   gap: 14px;
-  align-items: start;
+  align-items: stretch; /* both columns share the taller one's height */
 }
 .dash > .panel, .side > .panel { margin-bottom: 0; }
 .side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 
 /* The game board leans in 3D; keep it clipped to its panel so it never
    overlaps the sidebar, and let it sit tall in the column. */
-.game { overflow: hidden; }
-.game .arena-wrap { padding: 6px 0; }
+.game { overflow: hidden; display: flex; flex-direction: column; }
+/* Arena grows to fill the stretched panel, keeping the canvas centred so the
+   demo column lines up with the controls column instead of leaving a gap. */
+.game .arena-wrap { padding: 6px 0; flex: 1; display: grid; place-items: center; }
 
 /* Stack to a single column on narrower windows. */
 @media (max-width: 960px) {
