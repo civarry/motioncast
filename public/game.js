@@ -370,7 +370,7 @@ function setExpanded(on) {
   scene.classList.toggle("fs-active", on);
   document.body.classList.toggle("noscroll", on);
   const btn = $("fsBtn");
-  btn.textContent = on ? "✕" : "⛶";
+  btn.textContent = on ? "Exit" : "Expand";
   btn.title = on ? "Exit (Esc)" : "Expand";
 }
 $("fsBtn").addEventListener("click", () => setExpanded(!scene.classList.contains("fs-active")));

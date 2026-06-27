@@ -37,7 +37,7 @@ body.laptop { max-width: 1500px; padding: 16px; }
 
 .dash {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(330px, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(330px, 1fr);
   gap: 14px;
   align-items: stretch; /* both columns share the taller one's height */
 }
@@ -157,8 +157,8 @@ a { color: var(--accent); }
 /* Fullscreen toggle button on the orientation scene */
 .fsbtn {
   position: absolute; top: 8px; right: 8px; z-index: 3;
-  width: 36px; height: 36px; padding: 0; line-height: 1;
-  font-size: 1.05rem; opacity: .5; border-radius: 9px;
+  padding: 6px 10px; line-height: 1;
+  font-size: .72rem; opacity: .55; border-radius: 9px;
 }
 .fsbtn:hover { opacity: 1; border-color: var(--accent); }
 
@@ -173,7 +173,7 @@ body.noscroll { overflow: hidden; }
 .scene.fs-active #phone3d { transform: scale(4); }
 .scene.fs-active .bed { height: 12%; }
 .scene.fs-active .ffFlash { top: 6%; font-size: 1.1rem; }
-.scene.fs-active .fsbtn { top: 18px; right: 18px; width: 44px; height: 44px; font-size: 1.3rem; }
+.scene.fs-active .fsbtn { top: 18px; right: 18px; font-size: .85rem; padding: 8px 14px; }
 
 /* FREEFALL banner, flashes during airtime */
 .ffFlash {
@@ -272,7 +272,9 @@ body.noscroll { overflow: hidden; }
 }
 
 canvas#arena {
-  width: 100%; height: auto; background: #080b11; border: 1px solid var(--line);
+  /* Portrait playfield to match the phone. Intrinsic 480x760 is clamped to fit
+     within the (stretched) panel, preserving aspect ratio. */
+  max-width: 100%; max-height: 100%; background: #080b11; border: 1px solid var(--line);
   border-radius: 12px; display: block; touch-action: none;
   transform-style: preserve-3d; will-change: transform;
   box-shadow: 0 18px 40px rgba(0, 0, 0, .45);

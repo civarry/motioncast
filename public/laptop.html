@@ -10,12 +10,12 @@
 <body class="laptop">
   <header class="topbar panel">
     <div class="brand">
-      <h1>📡 MotionCast</h1>
+      <h1>MotionCast</h1>
       <p class="sub">Your phone's motion, orientation &amp; haptics — live on this screen.</p>
     </div>
     <div class="status">
       <span class="pill"><span id="wsDot" class="dot"></span> <span id="wsText">offline</span></span>
-      <span class="pill">📱 phones: <strong id="phones">0</strong></span>
+      <span class="pill">phones: <strong id="phones">0</strong></span>
       <span class="pill">link: <strong id="linkStat">—</strong></span>
       <span class="pill">score: <span id="score" class="score" style="font-size:1rem">0</span></span>
     </div>
@@ -23,14 +23,14 @@
 
   <main class="dash">
     <section class="panel game">
-      <h2 style="margin-bottom:10px">🎮 Demo — Tilt Arena <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">· roll the ball by tilting your phone</span></h2>
+      <h2 style="margin-bottom:10px">Demo — Tilt Arena <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">· roll the ball by tilting your phone</span></h2>
       <div class="arena-wrap">
-        <canvas id="arena" width="680" height="420"></canvas>
+        <canvas id="arena" width="480" height="760"></canvas>
       </div>
       <div id="waiting" class="connect">
         <div class="qr"><img id="qrImg" alt="QR code to connect your phone" /></div>
         <div class="connect-text">
-          <p><strong>📷 Scan to connect</strong> — point your phone's camera at the code.</p>
+          <p><strong>Scan to connect</strong> — point your phone's camera at the code.</p>
           <p class="hint">Or open <code class="url" id="phoneUrl">…</code> on your phone (same Wi-Fi).</p>
           <p class="hint">Accept the certificate warning, tap <strong>Start sensors</strong>, then tilt.</p>
         </div>
@@ -41,7 +41,7 @@
       <div class="panel">
         <h2>Live orientation</h2>
         <div class="scene">
-          <button id="fsBtn" class="fsbtn" title="Fullscreen (Esc to exit)" aria-label="Fullscreen">⛶</button>
+          <button id="fsBtn" class="fsbtn" title="Expand (Esc to exit)" aria-label="Expand">Expand</button>
           <div class="grid3d"></div>
           <div id="phone3d"><div class="phone" id="phoneModel">
             <div class="face front">
@@ -126,8 +126,8 @@
           <p class="hint" style="margin:10px 0 4px">Event log (newest first):</p>
           <pre id="eventLog" class="dbg" style="max-height:150px"></pre>
           <div class="row">
-            <button id="exportCfg" class="accent">⬇ Export settings</button>
-            <button id="importCfg">⬆ Import…</button>
+            <button id="exportCfg" class="accent">Export settings</button>
+            <button id="importCfg">Import…</button>
             <input id="importFile" type="file" accept="application/json" hidden />
           </div>
         </details>
