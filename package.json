@@ -3,6 +3,22 @@
   "version": "0.1.0",
   "description": "Use your phone's sensors (gyroscope, motion, haptics) as a controller for your laptop, over a local HTTPS + WebSocket link. PWA-installable on Android.",
   "type": "module",
+  "keywords": [
+    "sensors",
+    "gyroscope",
+    "deviceorientation",
+    "accelerometer",
+    "haptics",
+    "websocket",
+    "pwa",
+    "controller",
+    "quaternion"
+  ],
+  "author": "civarry",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
