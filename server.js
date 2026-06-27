@@ -89,8 +89,29 @@ const server = isCloud
 // ---- WebSocket relay ----
 // Rooms hold { phones:Set, laptops:Set }. Phones broadcast sensor frames to
 // laptops in the same room; laptops can send haptic commands back to phones.
-const wss = new WebSocketServer({ server });
+//
+// Abuse limits (defense-in-depth behind Cloudflare): a flood that gets past the
+// edge still can't exhaust this process. Frames are tiny JSON, so these ceilings
+// are generous for real use and tunable via env vars.
+const MAX_PAYLOAD = Number(process.env.MC_MAX_PAYLOAD) || 8 * 1024;   // bytes/message
+const MAX_CONNS_PER_IP = Number(process.env.MC_MAX_CONNS_PER_IP) || 8;
+const MAX_TOTAL_CONNS = Number(process.env.MC_MAX_TOTAL_CONNS) || 1000;
+const MSGS_PER_SEC = Number(process.env.MC_MSGS_PER_SEC) || 150;      // per connection
+
+const wss = new WebSocketServer({ server, maxPayload: MAX_PAYLOAD });
 const rooms = new Map();
+const ipConns = new Map(); // ip -> active connection count
+let totalConns = 0;
+
+// Real client IP: Cloudflare/host sets these; fall back to the socket address.
+function clientIp(req) {
+  return (
+    req.headers["cf-connecting-ip"] ||
+    (req.headers["x-forwarded-for"] || "").split(",")[0].trim() ||
+    req.socket.remoteAddress ||
+    "unknown"
+  );
+}
 
 function room(name) {
   if (!rooms.has(name)) rooms.set(name, new Set());
@@ -111,11 +132,27 @@ function announcePeers(roomName) {
   broadcast(roomName, () => true, { type: "peers", phones, laptops });
 }
 
-wss.on("connection", (ws) => {
+wss.on("connection", (ws, req) => {
+  const ip = clientIp(req);
+  // Refuse connections over the global or per-IP ceilings (1013 = try later).
+  if (totalConns >= MAX_TOTAL_CONNS || (ipConns.get(ip) || 0) >= MAX_CONNS_PER_IP) {
+    ws.close(1013, "too many connections");
+    return;
+  }
+  totalConns++;
+  ipConns.set(ip, (ipConns.get(ip) || 0) + 1);
+
   ws.role = "unknown";
   ws.room = "default";
+  ws.winStart = Date.now();
+  ws.winCount = 0;
 
   ws.on("message", (raw) => {
+    // Per-connection message rate limit (sliding 1s window).
+    const now = Date.now();
+    if (now - ws.winStart >= 1000) { ws.winStart = now; ws.winCount = 0; }
+    if (++ws.winCount > MSGS_PER_SEC) { ws.close(1008, "rate limit exceeded"); return; }
+
     let data;
     try {
       data = JSON.parse(raw);
@@ -162,9 +199,16 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
+    totalConns = Math.max(0, totalConns - 1);
+    const n = (ipConns.get(ip) || 1) - 1;
+    if (n <= 0) ipConns.delete(ip); else ipConns.set(ip, n);
+
     if (rooms.has(ws.room)) {
-      room(ws.room).delete(ws);
-      announcePeers(ws.room);
+      const set = room(ws.room);
+      set.delete(ws);
+      // Drop empty rooms so per-session room ids don't accumulate forever.
+      if (set.size === 0) rooms.delete(ws.room);
+      else announcePeers(ws.room);
     }
   });
 });
