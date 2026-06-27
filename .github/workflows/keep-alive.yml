@@ -1,0 +1,36 @@
+name: Keep Render awake
+
+# Render free web services sleep after ~15 minutes of no traffic, so the first
+# visitor after a nap waits ~30s for a cold start. A periodic request keeps the
+# instance warm. We hit /api/info (tiny JSON, also the health check) every ~10
+# minutes to stay well under the 15-minute idle window.
+#
+# Note: GitHub's scheduler is best-effort and can run late, so for a hard
+# guarantee a dedicated pinger (cron-job.org / UptimeRobot, every 5 min) is more
+# reliable. This workflow matches the repo's own tooling and costs nothing on a
+# public repo.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping the app
+        env:
+          # Change this if you move to a custom domain.
+          APP_URL: https://motioncast.onrender.com/api/info
+        run: |
+          # First hit after a sleep takes ~30s to wake, so allow time + retries.
+          STATUS=$(curl -sS -L \
+            --max-time 60 --retry 3 --retry-delay 10 \
+            -o /dev/null -w "%{http_code}" \
+            "$APP_URL" || echo "curl-error")
+          echo "Ping $APP_URL -> $STATUS"
