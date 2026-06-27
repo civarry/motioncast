@@ -54,6 +54,7 @@ $("calBtn").addEventListener("click", () => {
     return;
   }
   if (calTimer) return; // already counting down
+  console.log("[sensor-ctrl] calibrate tapped — starting countdown");
   let n = 3;
   permNote.textContent = `Hold the phone in your “front” pose — calibrating in ${n}…`;
   buzz(20);
@@ -66,6 +67,7 @@ $("calBtn").addEventListener("click", () => {
       clearInterval(calTimer);
       calTimer = null;
       ws.send(JSON.stringify({ type: "calibrate", room: ROOM }));
+      console.log("[sensor-ctrl] calibrate message SENT to laptop");
       buzz([15, 40, 15]);
       permNote.textContent = "Calibrated front ✓ — this pose is now the laptop's reference.";
     }

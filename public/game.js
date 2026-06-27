@@ -54,7 +54,10 @@ function connect() {
       if (m.phones === 0) needZero = true; // re-zero next phone that joins
     }
     if (m.type === "sensor") { frameCount++; onSensor(m); }
-    if (m.type === "calibrate") calibrateFront(true); // phone tapped "Calibrate front"
+    if (m.type === "calibrate") {
+      logEvent("RECV calibrate message from phone");
+      calibrateFront(true); // phone tapped "Calibrate front"
+    }
     // Round-trip carried the laptop's own clock, so halve for one-way latency.
     if (m.type === "pong") latencyMs = Math.max(0, Math.round((performance.now() - m.t) / 2));
   };
@@ -327,9 +330,25 @@ function renderPhone() {
 }
 renderPhone();
 
+// ---- On-screen event log (compare laptop vs phone calibration) ----
+const fmtQ = (q) => `(${q.x.toFixed(2)},${q.y.toFixed(2)},${q.z.toFixed(2)},${q.w.toFixed(2)})`;
+function logEvent(msg) {
+  console.log("[sensor-ctrl]", msg);
+  const el = $("eventLog");
+  if (!el) return;
+  const line = new Date().toLocaleTimeString() + "  " + msg;
+  el.textContent = [line, ...el.textContent.split("\n")].slice(0, 40).join("\n");
+}
+
 function calibrateFront(fromPhone) {
+  const before = qmul(conj(refQuat), liveQuat);
   refQuat = liveQuat;
   needZero = false;
+  const after = qmul(conj(refQuat), liveQuat); // should be ≈ identity (0,0,0,1)
+  logEvent(
+    `APPLY calibrate (${fromPhone ? "PHONE" : "LAPTOP"}) src=${sourceKey} ` +
+    `live=${fmtQ(liveQuat)} relBefore=${fmtQ(before)} relAfter=${fmtQ(after)}`
+  );
   const note = $("calNote");
   note.textContent = fromPhone
     ? "Calibrated from the phone ✓ — this pose is now “straight ahead.”"
@@ -339,7 +358,10 @@ function calibrateFront(fromPhone) {
   note.classList.add("flash"); // visible pulse so a remote calibrate is obvious
   sendHaptic([15, 40, 15]);
 }
-$("calibrate").addEventListener("click", () => calibrateFront(false));
+$("calibrate").addEventListener("click", () => {
+  logEvent("CLICK laptop Calibrate front button");
+  calibrateFront(false);
+});
 $("resetCal").addEventListener("click", () => {
   refQuat = ID;
   needZero = true;
