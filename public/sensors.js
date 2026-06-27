@@ -44,34 +44,17 @@ function buzz(pattern) {
 }
 $("buzzBtn").addEventListener("click", () => buzz([20, 60, 20]));
 
-// Ask the laptop to treat the phone's current pose as "straight ahead."
-// A short countdown lets you settle the phone into your real "front" pose after
-// tapping — otherwise it would capture the tilted "reaching to tap" pose.
-let calTimer = null;
+// Ask the laptop to treat the phone's current pose as "straight ahead" — the
+// pose at the moment of the tap, same as the laptop's own Calibrate button.
 $("calBtn").addEventListener("click", () => {
-  if (!(ws && ws.readyState === 1)) {
+  if (ws && ws.readyState === 1) {
+    ws.send(JSON.stringify({ type: "calibrate", room: ROOM }));
+    console.log("[sensor-ctrl] calibrate message SENT to laptop");
+    buzz([15, 40, 15]);
+    permNote.textContent = "Calibrated front ✓ — this pose is now the laptop's reference.";
+  } else {
     permNote.textContent = "Not connected yet — wait for the link, then calibrate.";
-    return;
   }
-  if (calTimer) return; // already counting down
-  console.log("[sensor-ctrl] calibrate tapped — starting countdown");
-  let n = 3;
-  permNote.textContent = `Hold the phone in your “front” pose — calibrating in ${n}…`;
-  buzz(20);
-  calTimer = setInterval(() => {
-    n--;
-    if (n > 0) {
-      permNote.textContent = `Hold steady — calibrating in ${n}…`;
-      buzz(20);
-    } else {
-      clearInterval(calTimer);
-      calTimer = null;
-      ws.send(JSON.stringify({ type: "calibrate", room: ROOM }));
-      console.log("[sensor-ctrl] calibrate message SENT to laptop");
-      buzz([15, 40, 15]);
-      permNote.textContent = "Calibrated front ✓ — this pose is now the laptop's reference.";
-    }
-  }, 1000);
 });
 document.querySelectorAll("[data-buzz]").forEach((b) =>
   b.addEventListener("click", () =>
