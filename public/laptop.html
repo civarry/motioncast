@@ -31,8 +31,9 @@
         <div class="qr"><img id="qrImg" alt="QR code to connect your phone" /></div>
         <div class="connect-text">
           <p><strong>Scan to connect</strong> - point your phone's camera at the code.</p>
-          <p class="hint">Or open <code class="url" id="phoneUrl">…</code> on your phone (same Wi-Fi).</p>
-          <p class="hint">Accept the certificate warning, tap <strong>Start sensors</strong>, then tilt.</p>
+          <p class="hint">Or open <code class="url" id="phoneUrl">…</code> on your phone<span id="netHint"></span>.</p>
+          <p class="hint" id="startHint">Tap <strong>Start sensors</strong>, then tilt.</p>
+          <p class="hint">This is a private session - only a phone that scans this code joins it.</p>
         </div>
       </div>
     </section>

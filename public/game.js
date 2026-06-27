@@ -1,8 +1,24 @@
 // Laptop receiver: listens for phone sensor frames, drives a tilt-controlled
 // ball game, visualizes orientation, and sends haptic commands back.
 
-const ROOM = new URLSearchParams(location.search).get("room") || "default";
 const $ = (id) => document.getElementById(id);
+
+// Each laptop visit gets its own room so visitors never cross sensor streams.
+// If the URL has no ?room=, mint a short id and pin it into the URL (no reload);
+// the QR then encodes a phone link carrying that same room, so only a phone that
+// scans this page's code joins this session.
+function newRoomId() {
+  const a = new Uint8Array(6);
+  crypto.getRandomValues(a);
+  return Array.from(a, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+let ROOM = new URLSearchParams(location.search).get("room");
+if (!ROOM) {
+  ROOM = newRoomId();
+  const u = new URL(location.href);
+  u.searchParams.set("room", ROOM);
+  history.replaceState(null, "", u);
+}
 
 const wsDot = $("wsDot"), wsText = $("wsText"), phones = $("phones");
 
@@ -23,6 +39,14 @@ if (onLocalhost) {
 } else {
   // Deployed: the public origin is already reachable from the phone.
   setPhoneUrl(`${location.origin}/${roomQS}`);
+}
+// Local dev needs the "same Wi-Fi" + self-signed cert caveats; a real deployment
+// (valid TLS, public URL) does not.
+if (onLocalhost) {
+  const netHint = $("netHint"), startHint = $("startHint");
+  if (netHint) netHint.textContent = " (same Wi-Fi)";
+  if (startHint)
+    startHint.innerHTML = "Accept the certificate warning, tap <strong>Start sensors</strong>, then tilt.";
 }
 
 let ws;
