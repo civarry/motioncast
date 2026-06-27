@@ -132,7 +132,19 @@ a { color: var(--accent); }
 
 .scene {
   display: grid; place-items: center; padding: 22px 10px; min-height: 300px;
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; perspective: 900px; perspective-origin: 50% 38%;
+}
+/* Faint receding floor grid — a ground plane to read the model's 3D pose against. */
+.grid3d {
+  position: absolute; left: 50%; bottom: 0; width: 230%; height: 150%;
+  transform: translateX(-50%) rotateX(74deg); transform-origin: bottom center;
+  background-image:
+    linear-gradient(to right, rgba(94, 234, 212, .11) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(94, 234, 212, .11) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 78%);
+          mask-image: linear-gradient(to top, #000 0%, transparent 78%);
+  pointer-events: none; z-index: 0;
 }
 /* The "bed" the phone lands on */
 .bed {
@@ -176,7 +188,7 @@ a { color: var(--accent); }
 .dropHud .g.hot { color: var(--bad); }
 
 /* --- 3D phone model. Box dims: W 92, H 184, D 18 (half: 46 / 92 / 9). --- */
-#phone3d { width: 92px; height: 184px; perspective: 760px; }
+#phone3d { width: 92px; height: 184px; perspective: 760px; position: relative; z-index: 1; }
 .phone {
   width: 100%; height: 100%; position: relative;
   transform-style: preserve-3d;
