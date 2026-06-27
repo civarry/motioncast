@@ -15,6 +15,17 @@ buzzes when you grab a target.
 
 ---
 
+## 🎬 Demo
+
+<!-- TODO: drop a screenshot / GIF here. Record the laptop page (3D model + Tilt
+     Arena) while tilting the phone, e.g. into docs/demo.gif, then:
+     ![Phone Sensor Controller demo](docs/demo.gif) -->
+
+_Screenshots / GIF coming soon — record the 3D model tracking your phone and a
+round of Tilt Arena._
+
+---
+
 ## ✨ Features
 
 - **Live 3D orientation** — a CSS-3D phone model tracks the device's real pose.
@@ -80,6 +91,9 @@ automatically into `.cert/` on first run.
   device→screen mapping handles CSS's Y-down axis and the yaw/roll convention
   difference between sensor APIs.
 
+The WebSocket message format is documented in **[docs/PROTOCOL.md](docs/PROTOCOL.md)** —
+enough to write your own controller or receiver.
+
 ## 📁 Project structure
 
 ```
@@ -107,6 +121,9 @@ This is a foundation — a lot can be built on the sensor stream:
 PRs and ideas welcome.
 
 ## 🤝 Contributing
+
+PRs and ideas welcome — see **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup,
+project layout, and guidelines. The short version:
 
 1. Fork and clone.
 2. `npm install && npm start`.
