@@ -130,7 +130,31 @@ button.toggle.active::before { content: "● "; }
 code.url { color: var(--accent); word-break: break-all; }
 a { color: var(--accent); }
 
-.scene { display: grid; place-items: center; padding: 22px 10px; min-height: 220px; }
+.scene {
+  display: grid; place-items: center; padding: 22px 10px; min-height: 300px;
+  position: relative; overflow: hidden;
+}
+/* The "bed" the phone lands on */
+.bed {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 30px;
+  background: linear-gradient(180deg, rgba(94,234,212,.12), rgba(94,234,212,.02));
+  border-top: 1px solid rgba(94,234,212,.35);
+}
+/* FREEFALL banner, flashes during airtime */
+.ffFlash {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  font-weight: 800; letter-spacing: .22em; font-size: .8rem; color: var(--warn);
+  padding: 4px 12px; border: 1px solid var(--warn); border-radius: 999px;
+  background: rgba(251,191,36,.12); text-shadow: 0 0 12px rgba(251,191,36,.6);
+  opacity: 0; transition: opacity .08s ease; pointer-events: none;
+}
+.ffFlash.on { opacity: 1; }
+.dropHud {
+  display: flex; gap: 10px; justify-content: center; margin-top: 8px;
+  font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.dropHud .g { color: var(--accent); font-weight: 700; }
+.dropHud .g.hot { color: var(--bad); }
 
 /* --- 3D phone model. Box dims: W 92, H 184, D 18 (half: 46 / 92 / 9). --- */
 #phone3d { width: 92px; height: 184px; perspective: 760px; }

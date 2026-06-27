@@ -169,6 +169,66 @@ let liveQuat = ID;         // current device orientation
 let shownQuat = ID;        // smoothed, displayed
 let needZero = true;       // snapshot the reference pose on the next valid frame
 
+// ---- Drop / freefall state ----
+// At rest |acceleration| ≈ 1g; in freefall it collapses toward 0g; on impact it
+// spikes. We track it as a ratio to an auto-calibrated baseline so it works
+// whether the device reports m/s² or g-units.
+let gBaseline = null, gNow = 1;
+let ffState = "idle", ffStart = 0, airtimeMs = 0, lastImpactG = 0;
+let dropY = 0, dropV = 0, dropPhase = "rest", settleAt = 0;
+
+function detectDrop() {
+  const now = performance.now();
+  if (ffState === "idle") {
+    if (gNow < 0.45) { ffState = "falling"; ffStart = now; dropPhase = "fall"; dropV = 0; }
+  } else { // falling
+    if (gNow > 1.7) {                 // impact spike → landed
+      airtimeMs = now - ffStart;
+      lastImpactG = gNow;
+      ffState = "idle";
+      dropPhase = "settle";
+      // gentle ouch vs. a real thud
+      sendHaptic(gNow > 2.4 ? [50, 40, 110] : [20, 30, 20]);
+    } else if (now - ffStart > 2500) { // set down gently, never slammed
+      ffState = "idle";
+      dropPhase = "settle";
+    }
+  }
+  updateDropHud();
+}
+
+function updateDropHud() {
+  const g = $("gMeter");
+  if (!g) return;
+  g.textContent = gNow.toFixed(2) + " g";
+  g.classList.toggle("hot", gNow > 1.7);
+  $("ffFlash").classList.toggle("on", ffState === "falling");
+  if (airtimeMs) $("airtime").textContent = Math.round(airtimeMs) + " ms air";
+  if (lastImpactG) $("peakG").textContent = "peak " + lastImpactG.toFixed(1) + " g";
+}
+
+// Per-frame vertical drop animation for the on-screen model (gravity + bounce).
+function animateDrop() {
+  const FLOOR = 60, G = 1.5, BOUNCE = 0.42;
+  if (dropPhase === "fall" || dropPhase === "settle") {
+    dropV += G;
+    dropY += dropV;
+    if (dropY >= FLOOR) {                    // hit the bed
+      dropY = FLOOR;
+      dropV = Math.abs(dropV) > 1.2 ? -dropV * BOUNCE : 0;
+    }
+    if (dropPhase === "settle" && dropY >= FLOOR && dropV === 0) {
+      if (!settleAt) settleAt = performance.now();
+      if (performance.now() - settleAt > 600) { dropPhase = "rest"; settleAt = 0; }
+    }
+  } else {                                   // rest → glide back to centre
+    dropY += (0 - dropY) * 0.08;
+    if (Math.abs(dropY) < 0.3) dropY = 0;
+    dropV = 0;
+  }
+  return dropY;
+}
+
 function onSensor(m) {
   if (m.beta != null) tilt.beta = m.beta;
   if (m.gamma != null) tilt.gamma = m.gamma;
@@ -194,6 +254,15 @@ function onSensor(m) {
     refreshControls();
   }
 
+  // Drop / freefall detection from acceleration magnitude (auto-calibrated 1g).
+  if (m.ax != null || m.ay != null || m.az != null) {
+    const mag = Math.hypot(m.ax || 0, m.ay || 0, m.az || 0);
+    if (gBaseline == null) gBaseline = mag || 9.81;
+    if (Math.abs(mag - gBaseline) < gBaseline * 0.2) gBaseline = gBaseline * 0.98 + mag * 0.02;
+    gNow = gBaseline ? mag / gBaseline : 1;
+    detectDrop();
+  }
+
   // First valid frame: treat however the phone is held now as "straight ahead."
   if (needZero && (m.qw != null || m.beta != null)) {
     refQuat = liveQuat;
@@ -215,7 +284,9 @@ function renderPhone() {
   if (inv.yaw) rel[yawComp()] = -rel[yawComp()];
   const tuned = qmul(rel, trimQuat()); // apply fine-tune offsets
   shownQuat = nlerp(shownQuat, tuned, 0.25);
-  phoneModel.style.transform = quatToMatrix3d(shownQuat, prof().swap);
+  // Vertical drop offset (freefall → fall + bounce on the bed) wraps the rotation.
+  const y = animateDrop().toFixed(1);
+  phoneModel.style.transform = `translateY(${y}px) ` + quatToMatrix3d(shownQuat, prof().swap);
   requestAnimationFrame(renderPhone);
 }
 renderPhone();
