@@ -7,122 +7,126 @@
   <title>Sensor Game — Laptop</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
-<body>
-  <h1>🖥️ Tilt Arena</h1>
-  <p class="sub">Roll the ball with your phone's tilt. Grab the glowing targets.</p>
-
-  <div class="panel">
-    <div class="row">
+<body class="laptop">
+  <header class="topbar panel">
+    <div class="brand">
+      <h1>🖥️ Tilt Arena</h1>
+      <p class="sub">Roll the ball with your phone's tilt. Grab the glowing targets.</p>
+    </div>
+    <div class="status">
       <span class="pill"><span id="wsDot" class="dot"></span> <span id="wsText">offline</span></span>
       <span class="pill">📱 phones: <strong id="phones">0</strong></span>
       <span class="pill">score: <span id="score" class="score" style="font-size:1rem">0</span></span>
     </div>
-  </div>
+  </header>
 
-  <div class="panel">
-    <div class="arena-wrap">
-      <canvas id="arena" width="680" height="420"></canvas>
-    </div>
-    <p id="waiting" class="hint" style="margin-top:10px">
-      Waiting for a phone… open <code class="url" id="phoneUrl">/</code> on your phone (same Wi-Fi),
-      tap <strong>Start sensors</strong>, then tilt.
-    </p>
-  </div>
-
-  <div class="row">
-    <div class="panel" style="flex:1">
-      <h2>Live orientation</h2>
-      <div class="scene">
-        <div id="phone3d"><div class="phone" id="phoneModel">
-          <div class="face front">
-            <div class="notch"></div>
-            <div class="cam"></div>
-            <span class="lbl">FRONT</span>
-          </div>
-          <div class="face back"><span class="lbl">BACK</span><div class="lens"></div></div>
-          <div class="face right"></div>
-          <div class="face left"></div>
-          <div class="face top"></div>
-          <div class="face bottom"></div>
-        </div></div>
+  <main class="dash">
+    <section class="panel game">
+      <div class="arena-wrap">
+        <canvas id="arena" width="680" height="420"></canvas>
       </div>
-      <div class="row" style="margin-top:10px">
-        <button id="wizStart" class="primary">Guided setup</button>
-        <button id="calibrate" class="accent">Calibrate front</button>
-        <button id="resetCal">Reset</button>
-      </div>
+      <p id="waiting" class="hint" style="margin-top:12px">
+        Waiting for a phone… open <code class="url" id="phoneUrl">/</code> on your phone (same Wi-Fi),
+        tap <strong>Start sensors</strong>, then tilt.
+      </p>
+    </section>
 
-      <div id="wizard" class="wizard" hidden>
-        <p id="wizText" class="wiztext"></p>
-        <div class="row">
-          <button id="wizPrimary" class="primary"></button>
-          <button id="wizSecondary"></button>
+    <aside class="side">
+      <div class="panel">
+        <h2>Live orientation</h2>
+        <div class="scene">
+          <div id="phone3d"><div class="phone" id="phoneModel">
+            <div class="face front">
+              <div class="notch"></div>
+              <div class="cam"></div>
+              <span class="lbl">FRONT</span>
+            </div>
+            <div class="face back"><span class="lbl">BACK</span><div class="lens"></div></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+          </div></div>
         </div>
-        <p class="hint" id="wizProgress" style="margin-top:8px"></p>
-      </div>
+        <div class="row" style="margin-top:10px">
+          <button id="wizStart" class="primary">Guided setup</button>
+          <button id="calibrate" class="accent">Calibrate front</button>
+          <button id="resetCal">Reset</button>
+        </div>
 
-      <div class="row" style="margin-top:8px">
-        <button id="inv-pitch" class="toggle">Invert pitch</button>
-        <button id="inv-roll" class="toggle">Invert roll</button>
-        <button id="inv-yaw" class="toggle">Invert yaw</button>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button id="swapAxes" class="toggle">Swap roll ↔ yaw</button>
-      </div>
-      <p class="hint" style="margin-top:6px">
-        Settings auto-switch per device type — active profile:
-        <strong id="profileLabel">—</strong>
-      </p>
-      <p class="hint" id="calNote" style="margin-top:8px">
-        Hold the phone facing you the way you want “straight ahead,” then tap
-        <strong>Calibrate front</strong>.
-      </p>
-      <div class="grid" style="margin-top:8px">
-        <div class="stat"><div class="k">β pitch</div><div class="v" id="beta">–</div></div>
-        <div class="stat"><div class="k">γ roll</div><div class="v" id="gamma">–</div></div>
-        <div class="stat"><div class="k">α yaw</div><div class="v" id="alpha">–</div></div>
-      </div>
+        <div id="wizard" class="wizard" hidden>
+          <p id="wizText" class="wiztext"></p>
+          <div class="row">
+            <button id="wizPrimary" class="primary"></button>
+            <button id="wizSecondary"></button>
+          </div>
+          <p class="hint" id="wizProgress" style="margin-top:8px"></p>
+        </div>
 
-      <details id="advanced" class="advanced">
-        <summary>Advanced · live values &amp; fine-tuning</summary>
-        <p class="hint" style="margin:10px 0 4px">
-          Sensor source: <strong id="dbgSource">–</strong>
+        <div class="row" style="margin-top:8px">
+          <button id="inv-pitch" class="toggle">Invert pitch</button>
+          <button id="inv-roll" class="toggle">Invert roll</button>
+          <button id="inv-yaw" class="toggle">Invert yaw</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button id="swapAxes" class="toggle">Swap roll ↔ yaw</button>
+        </div>
+        <p class="hint" style="margin-top:6px">
+          Settings auto-switch per device type — active profile:
+          <strong id="profileLabel">—</strong>
         </p>
-        <div class="trims">
-          <div class="trim">
-            <span class="trim-k">Trim pitch</span>
-            <input id="trim-pitch" class="trim-range" type="range" min="-180" max="180" step="1" value="0" />
-            <input id="trimnum-pitch" class="trim-num" type="number" min="-180" max="180" step="1" value="0" />
-          </div>
-          <div class="trim">
-            <span class="trim-k">Trim roll</span>
-            <input id="trim-roll" class="trim-range" type="range" min="-180" max="180" step="1" value="0" />
-            <input id="trimnum-roll" class="trim-num" type="number" min="-180" max="180" step="1" value="0" />
-          </div>
-          <div class="trim">
-            <span class="trim-k">Trim yaw</span>
-            <input id="trim-yaw" class="trim-range" type="range" min="-180" max="180" step="1" value="0" />
-            <input id="trimnum-yaw" class="trim-num" type="number" min="-180" max="180" step="1" value="0" />
-          </div>
+        <p class="hint" id="calNote" style="margin-top:8px">
+          Hold the phone facing you the way you want “straight ahead,” then tap
+          <strong>Calibrate front</strong>.
+        </p>
+        <div class="grid" style="margin-top:8px">
+          <div class="stat"><div class="k">β pitch</div><div class="v" id="beta">–</div></div>
+          <div class="stat"><div class="k">γ roll</div><div class="v" id="gamma">–</div></div>
+          <div class="stat"><div class="k">α yaw</div><div class="v" id="alpha">–</div></div>
         </div>
-        <pre id="dbgJson" class="dbg"></pre>
-        <div class="row">
-          <button id="exportCfg" class="accent">⬇ Export settings</button>
-          <button id="importCfg">⬆ Import…</button>
-          <input id="importFile" type="file" accept="application/json" hidden />
-        </div>
-      </details>
-    </div>
-    <div class="panel" style="flex:1">
-      <h2>Send haptics → phone</h2>
-      <div class="row" style="flex-direction:column">
-        <button data-buzz="40">Buzz</button>
-        <button data-buzz="20,60,20,60,20">Pattern</button>
-        <button data-buzz="400">Long</button>
+
+        <details id="advanced" class="advanced">
+          <summary>Advanced · live values &amp; fine-tuning</summary>
+          <p class="hint" style="margin:10px 0 4px">
+            Sensor source: <strong id="dbgSource">–</strong>
+          </p>
+          <div class="trims">
+            <div class="trim">
+              <span class="trim-k">Trim pitch</span>
+              <input id="trim-pitch" class="trim-range" type="range" min="-180" max="180" step="1" value="0" />
+              <input id="trimnum-pitch" class="trim-num" type="number" min="-180" max="180" step="1" value="0" />
+            </div>
+            <div class="trim">
+              <span class="trim-k">Trim roll</span>
+              <input id="trim-roll" class="trim-range" type="range" min="-180" max="180" step="1" value="0" />
+              <input id="trimnum-roll" class="trim-num" type="number" min="-180" max="180" step="1" value="0" />
+            </div>
+            <div class="trim">
+              <span class="trim-k">Trim yaw</span>
+              <input id="trim-yaw" class="trim-range" type="range" min="-180" max="180" step="1" value="0" />
+              <input id="trimnum-yaw" class="trim-num" type="number" min="-180" max="180" step="1" value="0" />
+            </div>
+          </div>
+          <pre id="dbgJson" class="dbg"></pre>
+          <div class="row">
+            <button id="exportCfg" class="accent">⬇ Export settings</button>
+            <button id="importCfg">⬆ Import…</button>
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </div>
+        </details>
       </div>
-      <p class="hint" style="margin-top:10px">Targets also auto-buzz the phone on pickup.</p>
-    </div>
-  </div>
+
+      <div class="panel">
+        <h2>Send haptics → phone</h2>
+        <div class="row">
+          <button data-buzz="40">Buzz</button>
+          <button data-buzz="20,60,20,60,20">Pattern</button>
+          <button data-buzz="400">Long</button>
+        </div>
+        <p class="hint" style="margin-top:10px">Targets also auto-buzz the phone on pickup.</p>
+      </div>
+    </aside>
+  </main>
 
   <script src="/game.js"></script>
 </body>

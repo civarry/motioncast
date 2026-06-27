@@ -25,6 +25,36 @@ html, body {
 
 body { padding: 18px; max-width: 720px; margin: 0 auto; }
 
+/* ---- Laptop dashboard layout: use the full width, minimise scrolling ---- */
+body.laptop { max-width: 1500px; padding: 16px; }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.topbar .brand h1 { margin: 0; }
+.topbar .brand .sub { margin: 4px 0 0; }
+.status { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.dash {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(330px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.dash > .panel, .side > .panel { margin-bottom: 0; }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+/* The game board leans in 3D; keep it clipped to its panel so it never
+   overlaps the sidebar, and let it sit tall in the column. */
+.game { overflow: hidden; }
+.game .arena-wrap { padding: 6px 0; }
+
+/* Stack to a single column on narrower windows. */
+@media (max-width: 960px) {
+  .dash { grid-template-columns: 1fr; }
+  .topbar { margin-bottom: 12px; }
+}
+
 h1 { font-size: 1.4rem; margin: 0 0 2px; letter-spacing: -0.02em; }
 h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 0 0 10px; }
 .sub { color: var(--muted); font-size: .85rem; margin: 0 0 18px; }
@@ -163,7 +193,7 @@ a { color: var(--accent); }
 
 .arena-wrap { perspective: 1100px; perspective-origin: 50% 45%; }
 canvas#arena {
-  width: 100%; background: #080b11; border: 1px solid var(--line);
+  width: 100%; height: auto; background: #080b11; border: 1px solid var(--line);
   border-radius: 12px; display: block; touch-action: none;
   transform-style: preserve-3d; will-change: transform;
   box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
