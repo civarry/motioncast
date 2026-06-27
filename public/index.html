@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0e14" />
+  <title>Phone Controller</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <h1>📱 Phone Controller</h1>
+  <p class="sub">Your phone becomes a motion + haptics controller for the laptop.</p>
+
+  <div class="panel">
+    <div class="row">
+      <span class="pill"><span id="wsDot" class="dot"></span> <span id="wsText">offline</span></span>
+      <span class="pill">🖥️ laptops: <strong id="laptops">0</strong></span>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button id="startBtn" class="primary">Start sensors</button>
+      <button id="buzzBtn" class="accent">Test buzz</button>
+    </div>
+    <p id="permNote" class="hint" style="margin-top:10px"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Orientation (gyroscope / tilt)</h2>
+    <div class="grid">
+      <div class="stat"><div class="k">α yaw</div><div class="v" id="alpha">–</div></div>
+      <div class="stat"><div class="k">β pitch</div><div class="v" id="beta">–</div></div>
+      <div class="stat"><div class="k">γ roll</div><div class="v" id="gamma">–</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Motion (accelerometer)</h2>
+    <div class="grid">
+      <div class="stat"><div class="k">x</div><div class="v" id="ax">–</div></div>
+      <div class="stat"><div class="k">y</div><div class="v" id="ay">–</div></div>
+      <div class="stat"><div class="k">z</div><div class="v" id="az">–</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Haptics</h2>
+    <div class="row">
+      <button data-buzz="20">Tap</button>
+      <button data-buzz="20,60,20,60,20">Triple</button>
+      <button data-buzz="300">Long</button>
+    </div>
+    <p class="hint" style="margin-top:10px">The laptop game can also buzz this phone when something happens.</p>
+  </div>
+
+  <p class="hint">Tip: open <code class="url">/laptop</code> on your computer to see the game.</p>
+
+  <script src="/sensors.js"></script>
+</body>
+</html>

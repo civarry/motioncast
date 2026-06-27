@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Auto-generated self-signed TLS cert (created on first run)
+.cert/
+
+# Runtime / debug artifacts
+*.log
+sensor-settings.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
