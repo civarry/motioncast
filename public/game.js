@@ -362,6 +362,16 @@ $("calibrate").addEventListener("click", () => {
   logEvent("CLICK laptop Calibrate front button");
   calibrateFront(false);
 });
+
+// Fullscreen the live-orientation scene (the model keeps tracking, just bigger).
+const scene = document.querySelector(".scene");
+$("fsBtn").addEventListener("click", () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else scene.requestFullscreen?.().catch(() => {});
+});
+document.addEventListener("fullscreenchange", () => {
+  scene.classList.toggle("fs-active", document.fullscreenElement === scene);
+});
 $("resetCal").addEventListener("click", () => {
   refQuat = ID;
   needZero = true;

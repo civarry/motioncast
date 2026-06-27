@@ -140,6 +140,25 @@ a { color: var(--accent); }
   background: linear-gradient(180deg, rgba(94,234,212,.12), rgba(94,234,212,.02));
   border-top: 1px solid rgba(94,234,212,.35);
 }
+/* Fullscreen toggle button on the orientation scene */
+.fsbtn {
+  position: absolute; top: 8px; right: 8px; z-index: 3;
+  width: 36px; height: 36px; padding: 0; line-height: 1;
+  font-size: 1.05rem; opacity: .5; border-radius: 9px;
+}
+.fsbtn:hover { opacity: 1; border-color: var(--accent); }
+
+/* Blown-up, centred model while the scene is fullscreen. The class is toggled
+   from JS on fullscreenchange (more reliable cross-browser than :fullscreen). */
+.scene.fs-active {
+  width: 100vw; height: 100vh; min-height: 0; padding: 0;
+  background: radial-gradient(1200px 800px at 50% 35%, #162433 0%, #0b0e14 70%);
+}
+.scene.fs-active #phone3d { transform: scale(4); }
+.scene.fs-active .bed { height: 12%; }
+.scene.fs-active .ffFlash { top: 6%; font-size: 1.1rem; }
+.scene.fs-active .fsbtn { top: 18px; right: 18px; width: 44px; height: 44px; font-size: 1.3rem; }
+
 /* FREEFALL banner, flashes during airtime */
 .ffFlash {
   position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
