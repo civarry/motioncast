@@ -91,15 +91,15 @@ generated automatically into `.cert/` on first run.
 
 ## Project structure
 
-```
-server.js                  HTTPS static host + WebSocket relay
-public/
-  index.html, sensors.js   phone controller (PWA)
-  laptop.html, game.js     receiver + 3D model + calibration UI + Tilt Arena
-  style.css                styles
-  manifest.webmanifest, sw.js, icon*.svg
-docs/PROTOCOL.md           WebSocket message reference
-```
+| Path | Purpose |
+| --- | --- |
+| `server.js` | HTTPS static host + WebSocket relay |
+| `public/index.html`, `public/sensors.js` | Phone controller (PWA) |
+| `public/laptop.html`, `public/game.js` | Receiver: 3D model, calibration UI, Tilt Arena |
+| `public/style.css` | Styles |
+| `public/manifest.webmanifest`, `public/sw.js`, `public/icon*.svg` | PWA install assets |
+| `docs/PROTOCOL.md` | WebSocket message reference |
+| `known-good-settings.json` | Importable calibration baseline (iPhone + Android) |
 
 ## Roadmap
 
