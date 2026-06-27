@@ -7,7 +7,7 @@ is to keep it easy to read, hack on, and learn from.
 
 ```bash
 git clone <your-fork-url>
-cd phone-sensor-controller
+cd motioncast
 npm install
 npm start
 ```

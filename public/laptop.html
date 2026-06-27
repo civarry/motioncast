@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0e14" />
-  <title>Sensor Game — Laptop</title>
+  <title>MotionCast — Receiver</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body class="laptop">
   <header class="topbar panel">
     <div class="brand">
-      <h1>🖥️ Tilt Arena</h1>
-      <p class="sub">Roll the ball with your phone's tilt. Grab the glowing targets.</p>
+      <h1>📡 MotionCast</h1>
+      <p class="sub">Your phone's motion, orientation &amp; haptics — live on this screen.</p>
     </div>
     <div class="status">
       <span class="pill"><span id="wsDot" class="dot"></span> <span id="wsText">offline</span></span>
@@ -23,6 +23,7 @@
 
   <main class="dash">
     <section class="panel game">
+      <h2 style="margin-bottom:10px">🎮 Demo — Tilt Arena <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">· roll the ball by tilting your phone</span></h2>
       <div class="arena-wrap">
         <canvas id="arena" width="680" height="420"></canvas>
       </div>

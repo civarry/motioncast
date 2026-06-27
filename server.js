@@ -162,10 +162,10 @@ wss.on("connection", (ws) => {
 });
 
 server.listen(PORT, () => {
-  console.log("\n  Phone Sensor Controller running\n");
-  console.log("  On this laptop (game view):");
+  console.log("\n  MotionCast running\n");
+  console.log("  On this computer (receiver + demo):");
   console.log(`    https://localhost:${PORT}/laptop\n`);
-  console.log("  On your phone (controller) — same Wi-Fi network:");
+  console.log("  On your phone (the caster) — same Wi-Fi network:");
   console.log(`    https://${IP}:${PORT}/\n`);
   console.log("  Accept the self-signed cert warning on first visit.\n");
 });

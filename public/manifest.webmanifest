@@ -1,7 +1,7 @@
 {
-  "name": "Phone Sensor Controller",
-  "short_name": "Sensor Ctrl",
-  "description": "Use your phone's gyroscope, motion and haptics to control your laptop.",
+  "name": "MotionCast",
+  "short_name": "MotionCast",
+  "description": "Cast your phone's motion, orientation and haptics to your computer in real time.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

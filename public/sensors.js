@@ -49,7 +49,7 @@ $("buzzBtn").addEventListener("click", () => buzz([20, 60, 20]));
 $("calBtn").addEventListener("click", () => {
   if (ws && ws.readyState === 1) {
     ws.send(JSON.stringify({ type: "calibrate", room: ROOM }));
-    console.log("[sensor-ctrl] calibrate message SENT to laptop");
+    console.log("[motioncast] calibrate message SENT to laptop");
     buzz([15, 40, 15]);
     permNote.textContent = "Calibrated front ✓ — this pose is now the laptop's reference.";
   } else {

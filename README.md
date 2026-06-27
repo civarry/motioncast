@@ -1,17 +1,20 @@
-# 📱→🖥️ Phone Sensor Controller
+# 📡 MotionCast
 
-Turn any phone into a real-time **motion + haptics controller** for your laptop —
-no app store, no native build. Open a web page on your phone, and its
-**orientation**, **accelerometer**, and **vibration** stream to your laptop over
-a local HTTPS + WebSocket link. Installable as a **PWA** on Android.
+**Cast your phone's motion to any screen.** Open a web page on your phone and its
+**orientation**, **accelerometer/gyroscope**, and **haptics** stream live to your
+computer over a local HTTPS + WebSocket link — no app store, no native build.
+Installable as a **PWA**.
 
-It ships with a live **3D phone model** that mirrors your device's real
-orientation, a guided calibration flow, and a demo game — **Tilt Arena** — where
-you roll a ball across a 3D-tilting board by leaning the phone, and the phone
-buzzes when you grab a target.
+MotionCast is a **foundation for building motion-driven things**: controllers,
+remotes, games, gesture tools, visualizers. It ships with a live **3D phone
+model** that mirrors your device's real orientation (gimbal-free, with calibration
+profiles), and a built-in demo — **Tilt Arena** — to show the sensor stream in
+action: you roll a ball across a 3D-tilting board by leaning the phone, and the
+phone buzzes when you grab a target.
 
-> Built as a "what can a phone's sensors drive on a laptop?" experiment. There's
-> a lot more you can build on top of it — see [Ideas](#-ideas--roadmap).
+> The game is just the friendly intro. The real product is the **calibrated,
+> cross-platform sensor stream** — see [Ideas](#-ideas--roadmap) for what to build
+> on it, and [docs/PROTOCOL.md](docs/PROTOCOL.md) to write your own client.
 
 ---
 
@@ -19,7 +22,7 @@ buzzes when you grab a target.
 
 <!-- TODO: drop a screenshot / GIF here. Record the laptop page (3D model + Tilt
      Arena) while tilting the phone, e.g. into docs/demo.gif, then:
-     ![Phone Sensor Controller demo](docs/demo.gif) -->
+     ![MotionCast demo](docs/demo.gif) -->
 
 _Screenshots / GIF coming soon — record the 3D model tracking your phone and a
 round of Tilt Arena._

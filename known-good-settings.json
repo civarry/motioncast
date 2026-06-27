@@ -1,5 +1,5 @@
 {
-  "app": "phone-sensor-controller",
+  "app": "motioncast",
   "note": "Known-good per-device orientation profiles. Load via the laptop page → Advanced → Import. The laptop auto-selects the profile matching the connected phone's sensor source.",
   "activeSource": "euler",
   "profiles": {

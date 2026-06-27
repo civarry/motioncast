@@ -333,7 +333,7 @@ renderPhone();
 // ---- On-screen event log (compare laptop vs phone calibration) ----
 const fmtQ = (q) => `(${q.x.toFixed(2)},${q.y.toFixed(2)},${q.z.toFixed(2)},${q.w.toFixed(2)})`;
 function logEvent(msg) {
-  console.log("[sensor-ctrl]", msg);
+  console.log("[motioncast]", msg);
   const el = $("eventLog");
   if (!el) return;
   const line = new Date().toLocaleTimeString() + "  " + msg;
@@ -433,7 +433,7 @@ const round4 = (q) => ({
 });
 function currentConfig() {
   return {
-    app: "phone-sensor-controller",
+    app: "motioncast",
     savedAt: new Date().toISOString(),
     activeSource: sourceKey,
     sourceLabel: lastSource,
