@@ -206,9 +206,11 @@ a { color: var(--accent); }
 .cam  { position: absolute; top: 9px; left: 50%; margin-left: 22px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 .lens { position: absolute; top: 14px; left: 16px; width: 16px; height: 16px; border-radius: 50%; background: #060a0f; border: 2px solid var(--accent-2); }
 
-/* side edges give the slab real thickness */
-.right, .left  { width: 18px; height: 184px; margin: -92px 0 0 -9px; background: linear-gradient(#1c2733, #0c141c); border-top: 1px solid rgba(94,234,212,.4); border-bottom: 1px solid rgba(94,234,212,.4); }
-.top, .bottom  { width: 92px; height: 18px; margin: -9px 0 0 -46px; background: linear-gradient(90deg, #1c2733, #0c141c); }
+/* Side edges give the slab real thickness. They're inset by the 16px corner
+   radius at each end so their square corners don't poke past the rounded
+   front/back faces (otherwise you get sharp tabs at the corners). */
+.right, .left  { width: 18px; height: 152px; margin: -76px 0 0 -9px; background: linear-gradient(#1c2733, #0c141c); border-top: 1px solid rgba(94,234,212,.4); border-bottom: 1px solid rgba(94,234,212,.4); }
+.top, .bottom  { width: 60px; height: 18px; margin: -9px 0 0 -30px; background: linear-gradient(90deg, #1c2733, #0c141c); }
 .right  { transform: rotateY(90deg)  translateZ(46px); }
 .left   { transform: rotateY(-90deg) translateZ(46px); }
 .top    { transform: rotateX(90deg)  translateZ(92px); }
