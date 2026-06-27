@@ -10,6 +10,11 @@ import { WebSocketServer } from "ws";
 import QRCode from "qrcode";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+// Hosting platforms (Railway, Render, etc.) inject PORT and terminate TLS at
+// their edge, forwarding plain HTTP + WebSocket upgrades to us. Locally we run
+// our own HTTPS with a self-signed cert, since phone motion sensors require a
+// secure context and a bare LAN IP over http:// does not qualify.
+const isCloud = !!process.env.PORT;
 const PORT = process.env.PORT || 8443;
 
 // ---- Find LAN IP so we can print a phone-friendly URL ----
@@ -27,7 +32,7 @@ const IP = lanIP();
 const certDir = join(__dirname, ".cert");
 const keyPath = join(certDir, "key.pem");
 const crtPath = join(certDir, "cert.pem");
-if (!existsSync(keyPath) || !existsSync(crtPath)) {
+if (!isCloud && (!existsSync(keyPath) || !existsSync(crtPath))) {
   if (!existsSync(certDir)) mkdirSync(certDir);
   const attrs = [{ name: "commonName", value: IP }];
   const pems = selfsigned.generate(attrs, {
@@ -73,10 +78,9 @@ app.get("/api/qr", async (req, res) => {
   }
 });
 
-const server = https.createServer(
-  { key: readFileSync(keyPath), cert: readFileSync(crtPath) },
-  app
-);
+const server = isCloud
+  ? http.createServer(app)
+  : https.createServer({ key: readFileSync(keyPath), cert: readFileSync(crtPath) }, app);
 
 // ---- WebSocket relay ----
 // Rooms hold { phones:Set, laptops:Set }. Phones broadcast sensor frames to
@@ -162,6 +166,10 @@ wss.on("connection", (ws) => {
 });
 
 server.listen(PORT, () => {
+  if (isCloud) {
+    console.log(`MotionCast running on port ${PORT} (HTTP; platform terminates TLS).`);
+    return;
+  }
   console.log("\n  MotionCast running\n");
   console.log("  On this computer (receiver + demo):");
   console.log(`    https://localhost:${PORT}/laptop\n`);
@@ -170,10 +178,13 @@ server.listen(PORT, () => {
   console.log("  Accept the self-signed cert warning on first visit.\n");
 });
 
-// Friendly redirect from plain http -> https, in case someone forgets it.
-http
-  .createServer((req, res) => {
-    res.writeHead(301, { Location: `https://${req.headers.host?.split(":")[0]}:${PORT}${req.url}` });
-    res.end();
-  })
-  .listen(8080, () => console.log("  (http://<ip>:8080 redirects to https)\n"));
+// Local convenience: redirect plain http -> https so a forgotten scheme still
+// lands on the secure page. Not needed in the cloud (the platform owns TLS).
+if (!isCloud) {
+  http
+    .createServer((req, res) => {
+      res.writeHead(301, { Location: `https://${req.headers.host?.split(":")[0]}:${PORT}${req.url}` });
+      res.end();
+    })
+    .listen(8080, () => console.log("  (http://<ip>:8080 redirects to https)\n"));
+}

@@ -1,0 +1,12 @@
+# Render Blueprint: one-click deploy of the MotionCast server (static host +
+# WebSocket relay). Render terminates TLS and injects PORT; server.js detects
+# that and runs plain HTTP behind it. Free plan sleeps after inactivity.
+services:
+  - type: web
+    name: motioncast
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/info
+    autoDeploy: true
