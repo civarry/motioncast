@@ -52,12 +52,16 @@ That's it. Tilt your phone and watch the 3D model and the demo track it live.
 
 ## How it works
 
-```
- Phone (PWA)                     Server (Node)                  Computer (browser)
- -----------                     -------------                  ------------------
- sensors.js  --- sensor frames -->  server.js  --- relay --->   game.js
-   quaternion / euler                HTTPS static host            3D model + game
-   haptics      <-- haptic / ping -- WebSocket relay (rooms)  --- calibration UI
+```mermaid
+flowchart LR
+    P["Phone (PWA)<br/>sensors.js<br/>quaternion / euler, haptics"]
+    S["Server (Node)<br/>server.js<br/>HTTPS host, WebSocket relay (rooms)"]
+    C["Computer (browser)<br/>game.js<br/>3D model, game, calibration UI"]
+
+    P -->|sensor frames| S
+    S -->|relay| C
+    C -->|haptic, ping| S
+    S -->|relay| P
 ```
 
 - **Transport.** An Express server serves the PWA over HTTPS and runs a WebSocket
