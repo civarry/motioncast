@@ -40,8 +40,9 @@
     <aside class="side">
       <div class="panel">
         <h2>Live orientation</h2>
-        <div class="scene">
+        <div class="scene" title="Drag to orbit · scroll to zoom · double-click to reset">
           <button id="fsBtn" class="fsbtn" title="Expand (Esc to exit)" aria-label="Expand">Expand</button>
+          <div class="world" id="world">
           <div class="grid3d"></div>
           <div id="phone3d"><div class="phone" id="phoneModel">
             <div class="face front">
@@ -56,6 +57,7 @@
             <div class="face bottom"></div>
           </div></div>
           <div class="bed"></div>
+          </div>
           <span class="ffFlash" id="ffFlash">FREEFALL</span>
         </div>
         <div class="dropHud">

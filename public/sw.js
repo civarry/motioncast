@@ -5,7 +5,7 @@
 // immediately, and fall back to cache only when offline. (The previous
 // cache-first approach pinned phones to stale sensors.js / index.html after
 // updates.) Bump CACHE to invalidate everything an old worker stored.
-const CACHE = "motioncast-v2";
+const CACHE = "motioncast-v9";
 const SHELL = [
   "/",
   "/index.html",

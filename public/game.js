@@ -6,19 +6,24 @@ const $ = (id) => document.getElementById(id);
 
 const wsDot = $("wsDot"), wsText = $("wsText"), phones = $("phones");
 
-// Build the phone-facing URL from the server's LAN address and render a QR for
-// it, so a phone can join by scanning instead of typing an IP.
-fetch("/api/info")
-  .then((r) => r.json())
-  .then(({ ip, port }) => {
-    const url = `https://${ip}:${port}/` + (ROOM !== "default" ? `?room=${encodeURIComponent(ROOM)}` : "");
-    $("phoneUrl").textContent = url;
-    const img = $("qrImg");
-    if (img) img.src = "/api/qr?text=" + encodeURIComponent(url);
-  })
-  .catch(() => {
-    $("phoneUrl").textContent = `https://${location.hostname}:${location.port}/`;
-  });
+// Build the phone-facing URL and render a QR so a phone can join by scanning.
+function setPhoneUrl(url) {
+  $("phoneUrl").textContent = url;
+  const img = $("qrImg");
+  if (img) img.src = "/api/qr?text=" + encodeURIComponent(url);
+}
+const roomQS = ROOM !== "default" ? `?room=${encodeURIComponent(ROOM)}` : "";
+const onLocalhost = ["localhost", "127.0.0.1"].includes(location.hostname);
+if (onLocalhost) {
+  // Local dev: the laptop is on localhost, but the phone needs the LAN IP.
+  fetch("/api/info")
+    .then((r) => r.json())
+    .then(({ ip, port }) => setPhoneUrl(`https://${ip}:${port}/${roomQS}`))
+    .catch(() => setPhoneUrl(`${location.origin}/${roomQS}`));
+} else {
+  // Deployed: the public origin is already reachable from the phone.
+  setPhoneUrl(`${location.origin}/${roomQS}`);
+}
 
 let ws;
 let tilt = { beta: 0, gamma: 0 }; // smoothed control input
@@ -30,6 +35,15 @@ let scoreVal = 0;
 let viewOrientation =
   localStorage.getItem("view-orientation") === "landscape" ? "landscape" : "portrait";
 const isLandscape = () => viewOrientation === "landscape";
+
+// Orbit-camera state for the 3D scene: drag to rotate, wheel to zoom,
+// double-click to reset. Applied to the whole world (model + floor + bed), so
+// the viewpoint flies around the object while the model still tracks the phone.
+// Neutral is a flat, head-on view of the phone (the floor lies edge-on and all
+// but disappears). Orbiting by dragging is what reveals the 3D ground.
+const DEFAULT_VIEW = { rx: 0, ry: 0, zoom: 1 };
+let viewRX = DEFAULT_VIEW.rx, viewRY = DEFAULT_VIEW.ry, viewZoom = DEFAULT_VIEW.zoom;
+let fsScale = 1; // extra zoom while expanded; scales the whole world so the floor stays aligned
 
 // Link health: streamed frames per second + round-trip latency (ping/pong).
 let frameCount = 0, latencyMs = null, pingTimer = null;
@@ -341,7 +355,8 @@ function renderPhone() {
   // In landscape, spin the model 90° in the screen plane so it (and its motions)
   // read sideways, matching how the phone is held.
   const spin = isLandscape() ? "rotateZ(90deg) " : "";
-  phoneModel.style.transform = `translateY(${y}px) ` + spin + quatToMatrix3d(shownQuat, prof().swap);
+  phoneModel.style.transform =
+    `translateY(${y}px) ` + spin + quatToMatrix3d(shownQuat, prof().swap);
   requestAnimationFrame(renderPhone);
 }
 renderPhone();
@@ -388,10 +403,53 @@ function setExpanded(on) {
   const btn = $("fsBtn");
   btn.textContent = on ? "Exit" : "Expand";
   btn.title = on ? "Exit (Esc)" : "Expand";
+  fsScale = on ? 3.5 : 1;
+  applyOrbit();
 }
 $("fsBtn").addEventListener("click", () => setExpanded(!scene.classList.contains("fs-active")));
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && scene.classList.contains("fs-active")) setExpanded(false);
+});
+
+// ---- Orbit the CAMERA around the model (drag / wheel / double-click reset) ----
+// The whole 3D world (model + floor + bed) rotates/zooms, so it reads as the
+// viewpoint flying around the object rather than the object spinning in place.
+const world = $("world");
+const gridEl = world.querySelector(".grid3d");
+const bedEl = world.querySelector(".bed");
+const applyOrbit = () => {
+  world.style.transform =
+    `scale(${(viewZoom * fsScale).toFixed(3)}) rotateX(${viewRX}deg) rotateY(${viewRY}deg)`;
+  // Neutral stays flat/head-on; the ground fades in only as the camera orbits.
+  const ground = Math.min(1, (Math.abs(viewRX) + Math.abs(viewRY)) / 22);
+  if (gridEl) gridEl.style.opacity = ground;
+  if (bedEl) bedEl.style.opacity = ground;
+};
+applyOrbit();
+let orbiting = false, orbitX = 0, orbitY = 0;
+scene.addEventListener("pointerdown", (e) => {
+  if (e.target.closest(".fsbtn")) return; // let the expand button keep working
+  orbiting = true; orbitX = e.clientX; orbitY = e.clientY;
+  scene.setPointerCapture(e.pointerId);
+  scene.classList.add("grabbing");
+});
+scene.addEventListener("pointermove", (e) => {
+  if (!orbiting) return;
+  viewRY += (e.clientX - orbitX) * 0.5;                          // drag X -> orbit around
+  viewRX = Math.max(-90, Math.min(90, viewRX - (e.clientY - orbitY) * 0.5)); // drag Y -> tilt up/down
+  orbitX = e.clientX; orbitY = e.clientY;
+  applyOrbit();
+});
+const endOrbit = () => { orbiting = false; scene.classList.remove("grabbing"); };
+scene.addEventListener("pointerup", endOrbit);
+scene.addEventListener("pointercancel", endOrbit);
+scene.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  viewZoom = Math.max(0.4, Math.min(3, viewZoom * (e.deltaY < 0 ? 1.1 : 0.9)));
+  applyOrbit();
+}, { passive: false });
+scene.addEventListener("dblclick", () => {
+  viewRX = DEFAULT_VIEW.rx; viewRY = DEFAULT_VIEW.ry; viewZoom = DEFAULT_VIEW.zoom; applyOrbit();
 });
 $("resetCal").addEventListener("click", () => {
   refQuat = ID;
