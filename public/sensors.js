@@ -43,6 +43,17 @@ function buzz(pattern) {
   if (navigator.vibrate) navigator.vibrate(pattern);
 }
 $("buzzBtn").addEventListener("click", () => buzz([20, 60, 20]));
+
+// Ask the laptop to treat the phone's current pose as "straight ahead."
+$("calBtn").addEventListener("click", () => {
+  if (ws && ws.readyState === 1) {
+    ws.send(JSON.stringify({ type: "calibrate", room: ROOM }));
+    buzz([15, 40, 15]);
+    permNote.textContent = "Calibrated front ✓ — this pose is now the laptop's reference.";
+  } else {
+    permNote.textContent = "Not connected yet — wait for the link, then calibrate.";
+  }
+});
 document.querySelectorAll("[data-buzz]").forEach((b) =>
   b.addEventListener("click", () =>
     buzz(b.dataset.buzz.split(",").map(Number))

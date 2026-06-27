@@ -135,6 +135,12 @@ wss.on("connection", (ws) => {
       return;
     }
 
+    // Phone -> laptops: "make my current pose the front reference"
+    if (data.type === "calibrate" && ws.role === "phone") {
+      broadcast(ws.room, (c) => c.role === "laptop", data);
+      return;
+    }
+
     // Latency probe: laptop pings phones, each echoes it back as a pong. The
     // laptop carries its own clock in `t`, so round-trip needs no clock sync.
     if (data.type === "ping" && ws.role === "laptop") {

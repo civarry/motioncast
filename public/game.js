@@ -54,6 +54,7 @@ function connect() {
       if (m.phones === 0) needZero = true; // re-zero next phone that joins
     }
     if (m.type === "sensor") { frameCount++; onSensor(m); }
+    if (m.type === "calibrate") calibrateFront(true); // phone tapped "Calibrate front"
     // Round-trip carried the laptop's own clock, so halve for one-way latency.
     if (m.type === "pong") latencyMs = Math.max(0, Math.round((performance.now() - m.t) / 2));
   };
@@ -326,12 +327,15 @@ function renderPhone() {
 }
 renderPhone();
 
-$("calibrate").addEventListener("click", () => {
+function calibrateFront(fromPhone) {
   refQuat = liveQuat;
   needZero = false;
-  $("calNote").textContent = "Calibrated ✓ — this pose is now “straight ahead.”";
+  $("calNote").textContent = fromPhone
+    ? "Calibrated from the phone ✓ — this pose is now “straight ahead.”"
+    : "Calibrated ✓ — this pose is now “straight ahead.”";
   sendHaptic([15, 40, 15]);
-});
+}
+$("calibrate").addEventListener("click", () => calibrateFront(false));
 $("resetCal").addEventListener("click", () => {
   refQuat = ID;
   needZero = true;

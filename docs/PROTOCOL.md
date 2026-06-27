@@ -70,6 +70,17 @@ accepts: a single duration (ms) or an on/off array.
 The server forwards `haptic` messages only from `laptop` clients, only to
 `phone` clients in the same room.
 
+### `calibrate` — phone → laptops
+Asks the laptop(s) to treat the phone's **current pose** as "straight ahead"
+(the orientation reference). Lets you calibrate from the phone in hand without
+reaching for the laptop.
+
+```json
+{ "type": "calibrate", "room": "default" }
+```
+
+Forwarded only from `phone` clients to `laptop` clients in the same room.
+
 ### `ping` / `pong` — latency probe
 The laptop sends `ping` with its own clock in `t`; phones echo it straight back
 as `pong` with the same `t`. The laptop computes round-trip from `t` without any
