@@ -330,9 +330,13 @@ renderPhone();
 function calibrateFront(fromPhone) {
   refQuat = liveQuat;
   needZero = false;
-  $("calNote").textContent = fromPhone
+  const note = $("calNote");
+  note.textContent = fromPhone
     ? "Calibrated from the phone ✓ — this pose is now “straight ahead.”"
     : "Calibrated ✓ — this pose is now “straight ahead.”";
+  note.classList.remove("flash");
+  void note.offsetWidth;       // restart the animation
+  note.classList.add("flash"); // visible pulse so a remote calibrate is obvious
   sendHaptic([15, 40, 15]);
 }
 $("calibrate").addEventListener("click", () => calibrateFront(false));
